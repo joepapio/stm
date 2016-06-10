@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage[margin=1.25in]{geometry}
-\usepackage{pdfpages}
+\usepackage{pdfpages, natbib}
 \usepackage{float}
 
 \newcommand{\hh}[1]{{\color{magenta} #1}} 
@@ -17,8 +17,12 @@
 opts_knit$set(self.contained=FALSE)
 @
 
+\section{Introduction and Literature Review}
 
+Citing the R software \citep{R}, or as shown by \citet{discreteRV} ...
 
+\bibliographystyle{asa}
+\bibliography{references}
 
 
 \end{document}
