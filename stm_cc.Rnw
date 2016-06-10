@@ -5,10 +5,11 @@
 
 \newcommand{\hh}[1]{{\color{magenta} #1}} 
 
-\title{A Framework and Application for Efficient Analysis of Peptide Libraries}
-\author{Eric Riemer Hare}
+\title{A tbd title for STM paper}
+\author{Joseph Eduardo Papio}
 
 \begin{document}
+
 
 \maketitle
 
