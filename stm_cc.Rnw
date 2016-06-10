@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{pdfpages}
+\usepackage{float}
+
+\newcommand{\hh}[1]{{\color{magenta} #1}} 
+
+\title{A Framework and Application for Efficient Analysis of Peptide Libraries}
+\author{Eric Riemer Hare}
+
+\begin{document}
+
+\maketitle
+
+<<concordance, echo=FALSE>>=
+opts_knit$set(self.contained=FALSE)
+@
+
+My creative component consists of three separate papers, each covering a different component of the overall project I worked on. The layering of the three components is illustrated in Figure \ref{layers}. The structure of this document is organized in the same manner, beginning with discreteRV, continuing with peptider, and ending with PeLiCa.
+The discreteRV and peptider papers are to be submitted to the R journal, while the PeLiCa paper is to be submitted to the software issue of the Journal of the ACM. I have also attached the paper on peptide libraries, by Sieber et al., of which I was a contributor, which inspired much of this work. It was submitted to the Bioinformatics section of the Oxford Journals.
+
+
+
+\end{document}
