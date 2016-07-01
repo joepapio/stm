@@ -19,7 +19,32 @@ opts_knit$set(self.contained=FALSE)
 
 \section{Introduction and Literature Review}
 
+
+Methods of automated textual analysis 
+Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
+“Simple” Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. Unsupervised classification problem in machine learning (topics are not known before hand)
+Unlike previous probabilistic methods to model documents, LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. 
+Correlated topic models build on LDA by relaxing the independence assumption, which is likely/generally an unrealistic expectation when dealing with corpora/ large sets of documents. (cite blei/lafferty 2007) This overcomes a major limitation of LDA, its inability to incorporate correlation across topics.
+Structural topic models further build on the additions of correlated topic models by incorporating additional factors at the document level, such as particular characteristics of the author(s). (cite roberts et al 2013) 
+
+\citet{stm2013} apply their method to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
+
+could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time.
+
+\section{Methods and Application}
+apply LDA (similar to xkcd) to ANES data without taking respondent information into account
+then apply STM to ANES data, taking respondent information into account and compare
+
+
+
+
+
+
 Citing the R software \citep{R}, or as shown by \citet{discreteRV} ...
+
+
+
+
 
 \bibliographystyle{asa}
 \bibliography{references}
