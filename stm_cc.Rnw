@@ -18,7 +18,7 @@ opts_knit$set(self.contained=FALSE)
 @
 
 \section{Introduction and Literature Review}
-
+ 
 
 Methods of automated textual analysis 
 Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
