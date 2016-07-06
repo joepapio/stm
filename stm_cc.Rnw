@@ -40,7 +40,6 @@ then apply STM to ANES data, taking respondent information into account and comp
 
 
 
-Citing the R software \citep{R}, or as shown by \citet{discreteRV} ...
 
 
 
