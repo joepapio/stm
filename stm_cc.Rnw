@@ -22,8 +22,11 @@ opts_knit$set(self.contained=FALSE)
 
 Methods of automated textual analysis 
 Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
+
 “Simple” Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. Unsupervised classification problem in machine learning (topics are not known before hand)
+
 Unlike previous probabilistic methods to model documents, LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. 
+
 Correlated topic models build on LDA by relaxing the independence assumption, which is likely/generally an unrealistic expectation when dealing with corpora/ large sets of documents. (cite blei/lafferty 2007) This overcomes a major limitation of LDA, its inability to incorporate correlation across topics.
 Structural topic models further build on the additions of correlated topic models by incorporating additional factors at the document level, such as particular characteristics of the author(s). (cite roberts et al 2013) 
 
@@ -39,6 +42,26 @@ then apply STM to ANES data, taking respondent information into account and comp
 
 
 
+\centering Topic Prevalence:
+\begin{align*}
+	\mu_{d,k} &= X_d\gamma_k \\
+	\gamma_k &\sim \mathcal{N}(0,\sigma_k^2)\\
+	\sigma_k^2 &\sim Gamma(s^{\gamma}, r^{\gamma})
+\end{align*}
+
+\centering Language Model:
+\begin{align*}
+\theta_{d} &= LogisticNormal(\mu_d, \Sigma) \\
+z_{d,n} &\sim Mult(\theta_d)\\
+w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
+\end{align*}
+
+\centering Topical Content:
+\begin{align*}
+\beta_{d,v}^k &\propto exp(m_v+\kappa_v^{.,k}+\kappa_v^{y,.}+\kappa_v^{y,k}) \\
+\kappa_v^{y,k} &\sim Laplace(0,\tau_v^{y,k})\\
+\tau_v^{y,k} &\sim Gamma(s^{\kappa}, r^{\kappa})
+\end{align*}
 
 
 
