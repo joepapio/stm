@@ -121,10 +121,18 @@ out <-prepDocuments(documents.gs, vocab.gs, metadata.gs)
 # 
 # ?readCorpus
 
+#############################
 ###### xkcd application
 
+set.seed(11123)
+
 dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("character","character"),col.names=c("url","text"),quote="")
+dfTranscripts$number<- seq(from=1,to=1265,by=1)
+dfTranscripts$group<- rep(1:11,each=115)
+dfTranscripts$group <- as.factor(dfTranscripts$group)
 xkcd <- textProcessor(metadata = dfTranscripts, documents=dfTranscripts$text)
+
+
 
 Xmeta<-xkcd$meta
 Xvocab<-xkcd$vocab
@@ -136,16 +144,27 @@ docsX<-Xout$documents
 vocabX<-Xout$vocab
 metaX <-Xout$meta
 
-xkcdPrevFit <- stm(docsX,vocabX,K=10)
+xkcdPrevFit10 <- stm(docsX,vocabX,K=10, prevalence=~metaX$group)
 
+xkcdSelect10 <- selectModel(docsX,vocabX, K=10, runs=10)
 
-xkcdSelect <- selectModel(docsX,vocabX, K=10, runs=20)
-
-plotModels(xkcdSelect)
+plotModels(xkcdSelect4)
+plotModels(xkcdSelect5)
+plotModels(xkcdSelect6)
+plotModels(xkcdSelect7)
+plotModels(xkcdSelect8)
+plotModels(xkcdSelect9)
+plotModels(xkcdSelect10)
 
 xkcdFit <- xkcdSelect$runout[[1]]
 
-labelTopics(xkcdPrevFit, topics=c(1,3))
+labelTopics(xkcdPrevFit4, topics=c(1,2,3,4))
+labelTopics(xkcdPrevFit5, topics=c(1,2,3,4,5))
+labelTopics(xkcdPrevFit6, topics=c(1,2,3,4,5,6))
+labelTopics(xkcdPrevFit7, topics=c(1,2,3,4,5,6,7))
+labelTopics(xkcdPrevFit8, topics=c(1,2,3,4,5,6,7,8))
+labelTopics(xkcdPrevFit9, topics=c(1,2,3,4,5,6,7,8,9))
+labelTopics(xkcdPrevFit10, topics=c(1,2,3,4,5,6,7,8,9,10))
 
 # graphic list of topic words
 plot.STM(xkcdFit, type="labels", topics=c(1,2,3,4,5))

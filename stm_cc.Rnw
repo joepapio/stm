@@ -24,28 +24,43 @@ opts_knit$set(self.contained=FALSE)
 Methods of automated textual analysis 
 Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
 
-\hh{what data are LDA models dealing with? - give an example. the xkcd data would be good for the intro. }
-\hh{what is the goal of an LDA analysis? }
+To facilitate analysis, surveys are often collected in such a way as to give respondents a choice from one of several preset options. Open ended surveys are often avoided, since analysis of the responses can often be very time and labor intensive, requiring human coders to read through the indvidual responses and then decide what thematic information is contained within them. 
+
+Topic modeling is an attempt to bring some reliable level of automatiion to qunatifying the thematic information in text responses such as open ended surveys. The group of survey responses can be treated as a corpus, with the goal of estimating the proportions with which those themes, which we define as topics, occur within the documents of the corpus. %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
+
+ "Simple" Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. %exchangability - conditional independence, ith and jth instances can be switched, order doesn't matter
+ Obviously, the order of the words as they appear does matter for English syntax, but LDA treats each document as a "bag of words", essentially ignoring syntactic information and focusing entirely on the semantic information.
+ 
+ %\hh{define exchangeability and independence in the context of LDA}
+
+%\hh{what data are LDA models dealing with? - give an example. the xkcd data would be good for the intro. }
+%\hh{what is the goal of an LDA analysis? }
 
 ``Simple" Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. \hh{define exchangeability and independence in the context of LDA} Unsupervised classification problem in machine learning (topics are not known before hand)
 
-Unlike previous probabilistic methods to model documents\hh{ give an example (with citation) of a previous method}, LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. 
+Unlike previous probabilistic methods to model documents, such as probabilistic latent semantic indexing (hoffman 99), LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. 
+%\hh{ give an example (with citation) of a previous method}
 
 A major limitation of LDA is its inability to incorporate correlation across topics. 
 In practice, independence between documents is an unrealistic expectation when dealing with large sets of documents.
 Correlated topic models build on LDA by relaxing the independence assumption (cite blei/lafferty 2007) \hh{give the math of how this independence assumption is relaxed.} 
 
-Structural topic models further build on the additions of correlated topic models by incorporating additional factors at the document level, such as particular characteristics of the author(s). (cite roberts et al 2013) \hh{please give an example here - it's getting very abstract.}
+Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s). (cite roberts et al 2013) \hh{please give an example here - it's getting very abstract.}
 
-\citet{stm2013} apply their method \hh{what is their method?} to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
+For example, in the ANES dataset, document level covariates would include the respondent's gender, race, and/or party affiliation.
 
-could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
+\citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
+to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
+
 
 \section{Methods and Application}
 apply LDA (similar to xkcd) to ANES data without taking respondent information into account
 then apply STM to ANES data, taking respondent information into account and compare
 
 
+\section{Conclusion}
+
+could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
 
 
 \hh{you'll need to define every symbol and index that you use.}
