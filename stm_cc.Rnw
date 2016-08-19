@@ -24,9 +24,9 @@ opts_knit$set(self.contained=FALSE)
 Methods of automated textual analysis 
 Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
 
-To facilitate analysis, surveys are often collected in such a way as to give respondents a choice from one of several preset options. Open ended surveys are often avoided, since analysis of the responses can often be very time and labor intensive, requiring human coders to read through the indvidual responses and then decide what thematic information is contained within them. 
+To facilitate analysis, surveys are often collected in such a way as to give respondents a choice from one of several preselected options, since analysis of open ended survey responses can be very time and labor intensive, requiring human coders to read through the indvidual responses, make judgements, and then code what thematic information is contained within them. 
 
-Topic modeling is an attempt to bring some reliable level of automatiion to qunatifying the thematic information in text responses such as open ended surveys. The group of survey responses can be treated as a corpus, with the goal of estimating the proportions with which those themes, which we define as topics, occur within the documents of the corpus. %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
+Topic modeling is an attempt to bring some reliable level of automatiion to qunatifying the thematic information in the text responses collected from open ended surveys. We define each response as a document and the specific set of survey responses as our corpus. To determine the thematic content of the documents and the corpus,  with the goal of estimating the proportions with which those themes, which we define as topics, occur within the documents of the corpus. %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
 
  "Simple" Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. %exchangability - conditional independence, ith and jth instances can be switched, order doesn't matter
  Obviously, the order of the words as they appear does matter for English syntax, but LDA treats each document as a "bag of words", essentially ignoring syntactic information and focusing entirely on the semantic information.
@@ -49,6 +49,8 @@ For example, in the ANES dataset, document level covariates include the responde
 
 \citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
 to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
+
+% with LDA, priors for topics and words are dirichlets, whereas with STM, priors for toopics are Normal-Gamma topic and Gamma Lasso for kappa 
 
 
 \section{Methods and Application}
