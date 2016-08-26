@@ -38,6 +38,8 @@ metaX <-Xout$meta
 
 @
 
+need to describe the Variational expectation maximization (EM) algorithms used by STM package. (fast variant of nonconjugate variational Expectation Maximization
+Roberts et al use this rather than collapsed Gibbs Sampling or mean field variational Gibbs because of nonconjugacy due to the choice of Logistic Normal for the prior.
 
 <<models,echo=FALSE >>=
 #k is the number of topics to fit.
