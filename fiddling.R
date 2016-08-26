@@ -156,7 +156,7 @@ plotModels(xkcdSelect8)
 plotModels(xkcdSelect9)
 plotModels(xkcdSelect10)
 
-xkcdFit <- xkcdSelect$runout[[1]]
+xkcdFit <- xkcdSelect10$runout[[1]]
 
 labelTopics(xkcdPrevFit4, topics=c(1,2,3,4))
 labelTopics(xkcdPrevFit5, topics=c(1,2,3,4,5))

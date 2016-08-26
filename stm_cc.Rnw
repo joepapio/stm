@@ -53,10 +53,15 @@ to open ended survey data from the ANES, collected in 2008. We futher apply thei
 % with LDA, priors for topics and words are dirichlets, whereas with STM, priors for toopics are Normal-Gamma topic and Gamma Lasso for kappa 
 
 
-\section{Methods and Application}
+\section{Methods}
 apply LDA (similar to xkcd) to ANES data without taking respondent information into account
 then apply STM to ANES data, taking respondent information into account and compare
 
+\section{Applications}
+
+\subsection{xkcd}
+
+\subsection{ANES}
 
 \section{Conclusion}
 
