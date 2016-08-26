@@ -170,6 +170,9 @@ labelTopics(xkcdPrevFit10, topics=c(1,2,3,4,5,6,7,8,9,10))
 plot.STM(xkcdFit, type="labels", topics=c(1,2,3,4,5))
 
 #no meta data to use for estimating any effects
-#prepX <- estimateEffect()
+#prepX <- estimateEffect(1:2~metaX$group,xkcdFit)
 
-plot.STM(xkcdFit, type="perspectives", topics=2)
+group <- dfTranscripts$group
+
+#plot.STM(xkcdFit, type="perspectives", topics=2)
+
