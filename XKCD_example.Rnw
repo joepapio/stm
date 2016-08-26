@@ -9,6 +9,14 @@
 
 <<concordance, echo=FALSE>>=
 opts_knit$set(self.contained=FALSE)
+
+library(lda)
+library(tm)
+library(stm)
+library(topicmodels)
+library(Matrix)
+
+library(textir)
 @
 
 using XKCD data as an example, transcriptions from XX years worth of comics. Binned individual comic strips into 11 groups based on order in which they were published. (picked 11 because it divides sans remainder.) Although artificial, treating each bin as a "group" to mimic coveriates, as an analogue to the race, gender, party affiliation, etc, we expect to accompny our open ended text in the ANES data.
