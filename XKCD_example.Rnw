@@ -30,8 +30,13 @@ dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("c
 dfTranscripts$number<- seq(from=1,to=1265,by=1)
 dfTranscripts$group<- rep(1:11,each=115)
 dfTranscripts$group <- as.factor(dfTranscripts$group)
-xkcd <- textProcessor(metadata = dfTranscripts, documents=dfTranscripts$text)
+#consider changing sparse level to control words that show up infrequently
+#xkcd <- textProcessor(metadata = dfTranscripts, documents=dfTranscripts$text, sparselevel=1)
 
+# step by step text processing using the tm package
+dfTranscripts$Ptext <- dfTranscripts$text
+#strip whitespace
+dfTranscripts$Ptext <- tm_map(dfTranscripts$Ptext, stripWhitespace)
 
 
 Xmeta<-xkcd$meta
