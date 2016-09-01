@@ -1,6 +1,9 @@
-install.packages("ngram")
+
 library(tm)
 library(ngram)
+library(RWeka)
+library(quanteda)
+library(RColorBrewer)
 
 #read in text
 xTran <- Corpus(VectorSource(dfTranscripts$text))
@@ -77,3 +80,36 @@ ng <- ngram(str)
 get.phrasetable(ng)
 get.ngrams(ng)
 
+###
+##attempting to use quanteda package instead
+
+myCorpus <- corpus(dfTranscripts$text)
+
+summary(myCorpus, n=5)
+
+
+#add dummy meta data
+metadoc(myCorpus, "group") <- as.factor(rep(1:11,each=115))
+summary(myCorpus, n=5, showmeta=TRUE)
+
+
+##call a particular document from the corpus
+#texts(myCorpus)[2]
+
+# ##Tokenizing text into a document term matrix
+# tokens <- tokenize(myCorpus, removeNumbers=TRUE, removePunct=TRUE,removeSeparators=TRUE)
+# ngram <-ngrams(tokens, n=1:2)
+
+#create document term matrix, with 1-grams and 2-grams
+mydfm <- dfm(myCorpus, ignoredFeatures=c(stopwords("english"), "title"), stem=TRUE, ngrams=c(1,2), 
+             removeNumbers=TRUE, removePunct=TRUE,removeSeparators=TRUE)
+
+
+#review dtm
+topfeatures(mydfm, 20)
+head(mydfm)
+#Plot wordcloud
+plot(mydfm, max.words = 100, colors = brewer.pal(6, "Dark2"), scale = c(8, .5))
+
+mydfmG <- dfm(myCorpus, groups = "_group", ignoredFeatures=c(stopwords("english"), "title"), stem=TRUE, ngrams=c(1,2), 
+             removeNumbers=TRUE, removePunct=TRUE,removeSeparators=TRUE)
