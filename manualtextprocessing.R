@@ -135,7 +135,7 @@ stmdfm <- convert(mydfm, to="stm",
 #fit STM for corpus
 #init.type = "Spectral" is much faster than the default init.type=LDA"
 #need to read more about how "spectral" works
-stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta,, init.type="Spectral" )
+stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
 
 
 
