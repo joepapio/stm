@@ -9,8 +9,8 @@ library(stringi)
 library(Rtsne)
 library(geometry)
 
-#using TM package - probably need to redo this using the stringi package, since quanteda uses that package
-#instead of TM package
+#using TM package - probably need to redo this using the stringi package, since quanteda uses functions from
+#that package instead of TM package
 
 #read in text
 xTran <- Corpus(VectorSource(dfTranscripts$text))
