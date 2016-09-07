@@ -14,8 +14,22 @@
 
 \maketitle
 
-<<concordance, echo=FALSE>>=
+<<concordance, echo=FALSE, warning=FALSE, message=FALSE>>=
 opts_knit$set(self.contained=FALSE)
+
+library(tm)
+library(ngram)
+library(RWeka)
+library(quanteda)
+library(RColorBrewer)
+library(stm)
+library(stringi)
+library(Rtsne)
+library(geometry)
+
+set.seed(11123)
+
+dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("character","character"), col.names=c("url","text"),quote="")
 @
 
 \section{Introduction and Literature Review}
@@ -114,18 +128,18 @@ ex2f <-as.character(xTran[[612]])
 
 Then, the text is converted to lower case, the numbers and punctuation are removed, English stop words are removed, and the words are stemmed so that different forms of base words, like singular and plural instances, or different tenses, are counted as the same word. Lastly, any additional spacing between words is removed, resulting in a string of base forms for each document:
 
-<<examples1, echo=FALSE>>=
+<<examples2, echo=FALSE>>=
 ex1f
 ex2f
 @
 
 After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
 
-The resultant document feature matrix for the xkcd data set consists of 1265 rows (documents) and ____ columns (n-grams).
+The resultant document feature matrix for the xkcd data set consists of 1265 rows (documents) and () columns (n-grams).
 
-The most common ngrams are
+The most common ngrams are (add later)
 
-The 
+
 
 \subsection{ANES}
 
@@ -135,6 +149,7 @@ could also reference dynamic topic models (blei, lafferty 2006) which adds a tem
 
 
 \hh{you'll need to define every symbol and index that you use.}
+
 \centering Topic Prevalence:
 \begin{align*}
 	\mu_{d,k} &= X_d\gamma_k \\
