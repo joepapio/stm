@@ -20,43 +20,45 @@ xTran <- Corpus(VectorSource(dfTranscripts$text))
 #inspect(xTran[1:4])
 
 #examine a single line of the corpus
-writeLines(as.character(xTran[[1]]))
-writeLines(as.character(xTran[[2]]))
+writeLines(as.character(xTran[[30]]))
+writeLines(as.character(xTran[[612]]))
 
 #store to demonstrate chnages as text processing progresses
-ex1a <-as.character(xTran[[1]])
-ex2a <-as.character(xTran[[2]])
+ex1a <-as.character(xTran[[30]])
+ex2a <-as.character(xTran[[612]])
+
+ex2a <-as.character(xTran[[30]])
 
 #convert to lower case
 xTran <- tm_map(xTran, content_transformer(tolower))
 
-ex1b <-as.character(xTran[[1]])
-ex2b <-as.character(xTran[[2]])
+ex1b <-as.character(xTran[[30]])
+ex2b <-as.character(xTran[[612]])
 
 #remove stopwords, including "alt-title", which is in most of the comics as the mouse over text
 xTran <- tm_map(xTran, removeWords, c(stopwords("english"), "alt-title", "alt", "title"))
 
-ex1c <-as.character(xTran[[1]])
-ex2c <-as.character(xTran[[2]])
+ex1c <-as.character(xTran[[30]])
+ex2c <-as.character(xTran[[612]])
 
 #remove punctuation and numbers
 xTran <- tm_map(xTran, removePunctuation)
 xTran <- tm_map(xTran, removeNumbers)
 
-ex1d <-as.character(xTran[[1]])
-ex2d <-as.character(xTran[[2]])
+ex1d <-as.character(xTran[[30]])
+ex2d <-as.character(xTran[[612]])
 
 #stemming
 xTran <- tm_map(xTran, stemDocument)
 
-ex1e <-as.character(xTran[[1]])
-ex2e <-as.character(xTran[[2]])
+ex1e <-as.character(xTran[[30]])
+ex2e <-as.character(xTran[[612]])
 
 #remove any unnecessary white space
 xTran <- tm_map(xTran, stripWhitespace)
 
-ex1f <-as.character(xTran[[1]])
-ex2f <-as.character(xTran[[2]])
+ex1f <-as.character(xTran[[30]])
+ex2f <-as.character(xTran[[612]])
 
 #display example of steps
 ex1a

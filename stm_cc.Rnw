@@ -61,6 +61,72 @@ then apply STM to ANES data, taking respondent information into account and comp
 
 \subsection{xkcd}
 
+The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable "group" was added, dividing the corpus into 11 groups of 115 documents by simply taking the first 115 documents and calling them "group 1", the second 115 documents "group 2", and so forth.
+
+Prior to fitting models to the open ended text corpus, the documents must first undergo some basic text preprocessing. For the xkcd dataset, documents begin as one or more sentences plus some descriptive text, a transcription:
+
+<<examples1, echo=FALSE>>=
+xTran <- Corpus(VectorSource(dfTranscripts$text))
+
+#inspect a few documents in the corpus
+print("Comic 30")
+writeLines(as.character(xTran[[30]]))
+print("Comic 612")
+writeLines(as.character(xTran[[612]]))
+
+#store to demonstrate chnages as text processing progresses
+ex1a <-as.character(xTran[[30]])
+ex2a <-as.character(xTran[[612]])
+
+#convert to lower case
+xTran <- tm_map(xTran, content_transformer(tolower))
+
+ex1b <-as.character(xTran[[30]])
+ex2b <-as.character(xTran[[612]])
+
+#remove stopwords, including "alt-title", which is in most of the comics as the mouse over text
+xTran <- tm_map(xTran, removeWords, c(stopwords("english"), "alt-title", "alt", "title"))
+
+ex1c <-as.character(xTran[[30]])
+ex2c <-as.character(xTran[[612]])
+
+#remove punctuation and numbers
+xTran <- tm_map(xTran, removePunctuation)
+xTran <- tm_map(xTran, removeNumbers)
+
+ex1d <-as.character(xTran[[30]])
+ex2d <-as.character(xTran[[612]])
+
+#stemming
+xTran <- tm_map(xTran, stemDocument)
+
+ex1e <-as.character(xTran[[30]])
+ex2e <-as.character(xTran[[612]])
+
+#remove any unnecessary white space
+xTran <- tm_map(xTran, stripWhitespace)
+
+ex1f <-as.character(xTran[[30]])
+ex2f <-as.character(xTran[[612]])
+
+
+@
+
+Then, the text is converted to lower case, the numbers and punctuation are removed, English stop words are removed, and the words are stemmed so that different forms of base words, like singular and plural instances, or different tenses, are counted as the same word. Lastly, any additional spacing between words is removed, resulting in a string of base forms for each document:
+
+<<examples1, echo=FALSE>>=
+ex1f
+ex2f
+@
+
+After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
+
+The resultant document feature matrix for the xkcd data set consists of 1265 rows (documents) and ____ columns (n-grams).
+
+The most common ngrams are
+
+The 
+
 \subsection{ANES}
 
 \section{Conclusion}
