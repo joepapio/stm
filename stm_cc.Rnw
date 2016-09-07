@@ -128,18 +128,50 @@ ex2f <-as.character(xTran[[612]])
 
 Then, the text is converted to lower case, the numbers and punctuation are removed, English stop words are removed, and the words are stemmed so that different forms of base words, like singular and plural instances, or different tenses, are counted as the same word. Lastly, any additional spacing between words is removed, resulting in a string of base forms for each document:
 
-<<examples2, echo=FALSE>>=
+<<examples2, echo=FALSE, warning=FALSE, message=FALSE, verbose=FALSE>>=
 ex1f
 ex2f
+
+#convert vector from dataframe into an corpus for quanteda package
+myCorpus <- corpus(dfTranscripts$text)
+docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
+
+#create document feature matrix, with 1-grams and 2-grams
+mydfm <- dfm(myCorpus, stem=TRUE, ngrams=c(1,2), 
+             removeNumbers=TRUE, removePunct=TRUE,
+             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title"))
+
+#remove words with less than 4 occurances and in only one document
+mydfm <- trim(mydfm, minCount=4, minDoc=2)
+
+#further trim to include 5 or more occurances and in at least two docs
+mydfm <- trim(mydfm, minCount=5, minDoc=3)
+
+stmdfm <- convert(mydfm, to="stm",
+                  docvars=data.frame(group=docvars(myCorpus, "group")))
+
+stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
+
 @
 
-After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
+After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of useful information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
 
-The resultant document feature matrix for the xkcd data set consists of 1265 rows (documents) and () columns (n-grams).
+The resultant document feature matrix for the xkcd data set consists of 1265 rows, one for each document, and 2863 columns, one for each non trimmed n-gram remaining in the vocabulary. 
 
-The most common ngrams are (add later)
+<<examples3, echo=FALSE>>=
+as.matrix(mydfm)[c(30,612),40:50]
+
+#Plot wordcloud
+#plot(mydfm, max.words = 100, colors = brewer.pal(6, "Dark2"), scale = c(8, .5))
 
 
+@
+
+From here, the STM package (or LDA package) can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed. 
+
+<<examples4, echo=FALSE>>=
+plot.STM(stmFit, type = "summary", xlim = c(0, .3))
+@
 
 \subsection{ANES}
 

@@ -160,9 +160,11 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 #see footnote 11 on page 10 of STM vignette
 #setting K=0 uses an algorithm from another paper (Lee/Mimno 2014), allowing 
 #automatic selection of number of topics
-stmFit0 <- stm(stmdfm$documents, stmdfm$vocab, K=0, prevalence= ~group, data=stmdfm$meta,, init.type="Spectral" )
+stmFit0 <- stm(stmdfm$documents, stmdfm$vocab, K=0, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
 #when I rand this option, it fit a model with 63 topics, 150 iterations
 
 #this gives all topics, need to figure out how to limit to maybe top ten or so most commmon topics
 plot.STM(stmFit0, type = "summary",  xlim = c(0, .3))
 #labelTopics(stmFit0, topics=1:10)
+
+as.matrix(mydfm)[c(30,612),40:50]
