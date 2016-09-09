@@ -108,7 +108,7 @@ head(docvars(myCorpus))
 #create document term matrix, with 1-grams and 2-grams
 mydfm <- dfm(myCorpus, stem=TRUE, ngrams=c(1,2), 
              removeNumbers=TRUE, removePunct=TRUE,
-             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title"))
+             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text"))
 
 #remove words with less than 4 occurances and in only one document
 mydfm <- trim(mydfm, minCount=4, minDoc=2)
@@ -168,3 +168,9 @@ plot.STM(stmFit0, type = "summary",  xlim = c(0, .3))
 #labelTopics(stmFit0, topics=1:10)
 
 as.matrix(mydfm)[c(30,612),40:50]
+
+
+#trying four topics
+stmFit4 <- stm(stmdfm$documents, stmdfm$vocab, K=4, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
+labelTopics(stmFit4, topics=1:4)
+plot.STM(stmFit4, type = "summary",  xlim = c(0, .5))

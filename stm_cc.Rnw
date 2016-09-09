@@ -139,7 +139,7 @@ docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
 #create document feature matrix, with 1-grams and 2-grams
 mydfm <- dfm(myCorpus, stem=TRUE, ngrams=c(1,2), 
              removeNumbers=TRUE, removePunct=TRUE,
-             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title"))
+             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text"))
 
 #remove words with less than 4 occurances and in only one document
 mydfm <- trim(mydfm, minCount=4, minDoc=2)
@@ -156,7 +156,7 @@ stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stm
 
 After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of useful information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
 
-The resultant document feature matrix for the xkcd data set consists of 1265 rows, one for each document, and 2863 columns, one for each non trimmed n-gram remaining in the vocabulary. 
+The resultant document feature matrix for the xkcd data set consists of 1265 rows, one for each document, and 2850 columns, one for each non trimmed n-gram remaining in the vocabulary. 
 
 <<examples3, echo=FALSE>>=
 as.matrix(mydfm)[c(30,612),40:50]
