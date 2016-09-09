@@ -15,7 +15,7 @@
 \maketitle
 
 <<concordance, echo=FALSE, warning=FALSE, message=FALSE>>=
-opts_knit$set(self.contained=FALSE, cache=TRUE)
+opts_knit$set(self.contained=FALSE, cache=TRUE, width=40)
 
 library(tm)
 library(ngram)
@@ -30,6 +30,15 @@ library(geometry)
 set.seed(11123)
 
 dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("character","character"), col.names=c("url","text"),quote="")
+
+str_break = function(x, width = 70L) {
+  n = nchar(x)
+  if (n <= width) return(x)
+  n1 = seq(1L, n, by = width)
+  n2 = seq(width, n, by = width)
+  if (n %% width != 0) n2 = c(n2, n)
+  substring(x, n1, n2)
+}
 @
 
 \section{Introduction and Literature Review}
@@ -43,7 +52,7 @@ To facilitate analysis, surveys are often collected in such a way as to give res
 Topic modeling is an attempt to bring some reliable level of automatiion to qunatifying the thematic information in the text responses collected from open ended surveys. We define each response as a document and the specific set of survey responses as our corpus. To determine the thematic content of the documents and the corpus,  with the goal of estimating the proportions with which those themes, which we define as topics, occur within the documents of the corpus. %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
 
  "Simple" Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. %exchangability - conditional independence, ith and jth instances can be switched, order doesn't matter
- Obviously, the order of the words as they appear does matter for English syntax, but LDA treats each document as a "bag of words", essentially ignoring syntactic information and focusing entirely on the semantic information.
+ Obviously, the order of the words as they appear does matter for English syntax, but LDA treats each document as a ``bag of words", essentially ignoring syntactic information and focusing entirely on the semantic information.
  Unsupervised classification problem in machine learning (topics are not known before hand)
  %\hh{define exchangeability and independence in the context of LDA}
 
@@ -57,7 +66,7 @@ A major limitation of the original LDA is its inability to incorporate correlati
 In practice, independence between documents is an unrealistic expectation when dealing with large sets of documents. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. 
 Correlated topic models build on LDA by relaxing the independence assumption \citep{Blei:2007jy}. %(cite blei/lafferty 2007) %\hh{give the math of how this independence assumption is relaxed.} 
 
-Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s). (cite roberts et al 2013) %\hh{please give an example here - it's getting very abstract.}
+Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s) \citep{stm2013}. %\hh{please give an example here - it's getting very abstract.}
 
 For example, in the ANES dataset, document level covariates include the respondent's gender, race, and/or party affiliation.
 
@@ -79,14 +88,14 @@ The xkcd corpus consists of transcriptions of the first 1265 comics and artworks
 
 Prior to fitting models to the open ended text corpus, the documents must first undergo some basic text preprocessing. For the xkcd dataset, documents begin as one or more sentences plus some descriptive text, a transcription:
 
-<<examples1, echo=FALSE>>=
+<<examples1, echo=FALSE, tidy=TRUE>>=
 xTran <- Corpus(VectorSource(dfTranscripts$text))
 
 #inspect a few documents in the corpus
-print("Comic 30")
-writeLines(as.character(xTran[[30]]))
-print("Comic 612")
-writeLines(as.character(xTran[[612]]))
+cat("Comic 30:")
+print(str_break(as.character(xTran[[30]])))
+cat("Comic 612:")
+print(str_break(as.character(xTran[[612]])))
 
 #store to demonstrate chnages as text processing progresses
 ex1a <-as.character(xTran[[30]])
@@ -128,10 +137,14 @@ ex2f <-as.character(xTran[[612]])
 
 Then, the text is converted to lower case, the numbers and punctuation are removed, English stop words are removed, and the words are stemmed so that different forms of base words, like singular and plural instances, or different tenses, are counted as the same word. Lastly, any additional spacing between words is removed, resulting in a string of base forms for each document:
 
-<<examples2, echo=FALSE, warning=FALSE, message=FALSE, verbose=FALSE>>=
-ex1f
-ex2f
+<<print2, echo=FALSE, warning=FALSE, message=FALSE,  verbose=FALSE>>=
+cat("Comic 30:")
+print(str_break(ex1f))
+cat("Comic 612:")
+print(str_break(ex2f))
+@
 
+<<examples2, echo=FALSE, message=FALSE, verbose=FALSE, results='hide'>>=
 #convert vector from dataframe into an corpus for quanteda package
 myCorpus <- corpus(dfTranscripts$text)
 docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
@@ -169,9 +182,12 @@ as.matrix(mydfm)[c(30,612),40:50]
 
 From here, the STM package (or LDA package) can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed. 
 
+\begin{figure}
 <<examples4, echo=FALSE>>=
 plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 @
+\caption{\label{stm-plot} \hh{Plot result from plot.STM - this needs to have a better caption}}
+\end{figure}
 
 \subsection{ANES}
 
