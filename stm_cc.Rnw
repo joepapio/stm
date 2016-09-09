@@ -15,11 +15,11 @@
 \maketitle
 
 <<concordance, echo=FALSE, warning=FALSE, message=FALSE>>=
-opts_knit$set(self.contained=FALSE)
+opts_knit$set(self.contained=FALSE, cache=TRUE)
 
 library(tm)
 library(ngram)
-library(RWeka)
+#library(RWeka)
 library(quanteda)
 library(RColorBrewer)
 library(stm)
@@ -50,14 +50,14 @@ Topic modeling is an attempt to bring some reliable level of automatiion to quna
 %\hh{what data are LDA models dealing with? - give an example. the xkcd data would be good for the intro. }
 %\hh{what is the goal of an LDA analysis? }
 
-Unlike previous probabilistic methods to model documents, such as probabilistic latent semantic indexing (hoffman 99), LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. pLSI also requires increasing the number of parameters as the number of documents within a corpus increases.
+Unlike previous probabilistic methods to model documents, such as probabilistic latent semantic indexing \citep{hofmann:1999}, LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. pLSI also requires increasing the number of parameters as the number of documents within a corpus increases.
 %\hh{ give an example (with citation) of a previous method}
 
 A major limitation of the original LDA is its inability to incorporate correlation across topics. 
-In practice, independence between documents is an unrealistic expectation when dealing with large sets of documents. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that came before them. 
-Correlated topic models build on LDA by relaxing the independence assumption (cite blei/lafferty 2007) \hh{give the math of how this independence assumption is relaxed.} 
+In practice, independence between documents is an unrealistic expectation when dealing with large sets of documents. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. 
+Correlated topic models build on LDA by relaxing the independence assumption \citep{Blei:2007jy}. %(cite blei/lafferty 2007) %\hh{give the math of how this independence assumption is relaxed.} 
 
-Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s). (cite roberts et al 2013) \hh{please give an example here - it's getting very abstract.}
+Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s). (cite roberts et al 2013) %\hh{please give an example here - it's getting very abstract.}
 
 For example, in the ANES dataset, document level covariates include the respondent's gender, race, and/or party affiliation.
 
@@ -75,7 +75,7 @@ then apply STM to ANES data, taking respondent information into account and comp
 
 \subsection{xkcd}
 
-The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable "group" was added, dividing the corpus into 11 groups of 115 documents by simply taking the first 115 documents and calling them "group 1", the second 115 documents "group 2", and so forth.
+The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable ``group" was added, dividing the corpus into 11 groups of 115 documents each by simply taking the first 115 documents and calling them ``group 1", the second 115 documents ``group 2", and so forth. \hh{this group variable will capture some time component, right?}
 
 Prior to fitting models to the open ended text corpus, the documents must first undergo some basic text preprocessing. For the xkcd dataset, documents begin as one or more sentences plus some descriptive text, a transcription:
 
