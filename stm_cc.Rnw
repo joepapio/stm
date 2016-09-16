@@ -39,6 +39,8 @@ str_break = function(x, width = 70L) {
   if (n %% width != 0) n2 = c(n2, n)
   substring(x, n1, n2)
 }
+
+
 @
 
 \section{Introduction and Literature Review}
@@ -165,7 +167,7 @@ stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stm
 
 @
 
-After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of useful information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
+After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document, denoted \mathcal{X}. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of useful information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
 
 The resultant document feature matrix for the xkcd data set consists of 1265 rows, one for each document, and 2850 columns, one for each non trimmed n-gram remaining in the vocabulary. 
 
@@ -184,14 +186,14 @@ From here, the STM package (or LDA package) can be applied to the data, and topi
 <<examples4, echo=FALSE>>=
 plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 @
-\caption{\label{stm-plot} \hh{Plot result from plot.STM - this needs to have a better caption}}
+\caption{\label{stm-plot} Expected topic proportions and highest frequency words for xkcd dataset}
 \end{figure}
 
 \subsection{ANES}
 
 \section{Conclusion}
 
-could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
+%could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
 
 
 \hh{you'll need to define every symbol and index that you use.}
