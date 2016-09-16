@@ -47,46 +47,30 @@ Open ended survey responses provide an opportunity to solicit unguided opinions 
 
 The immediate benefit of the traditional survey forms is that once the data are collected, analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatiely low amounts of personnel and computing time. 
 
-Until the last decade or so, little existed in the way of automated processing or analysis of open ended surveys. Identification and analysis of the content of the responses often required a large number of person-hours, in which trianed readers went through individual responses, identifying the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those predetermined areas. %Which is to say, the application of of this processing via human readers might introduce bias into the results through the predetermined list of topic options.
+Until the last decade or so, little existed in the way of automated processing or analysis of open ended surveys. Identification and analysis of the content of the responses often requires a large number of person-hours, in which trianed readers go through individual responses, using their judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those predetermined areas. %Which is to say, the application of of this processing via human readers might introduce bias into the results through the predetermined list of topic options.
 
-%Methods of automated textual analysis 
-%Topic models-Application of Latent Dirichlet Allocation to the process of automatic/computer aided textual analysis known as Topic Models. 
-
-%To facilitate analysis, surveys are often collected in such a way as to give respondents a choice from one of several preselected options, since analysis of open ended survey responses can be very time and labor intensive, requiring human coders to read through the indvidual responses, make judgements, and then code what thematic information is contained within them. 
 
 %Enter topic models, pLSI (Hoffman) then LDA (Blei)
 Topic models attempt to bring some reliable level of automation to quantifying the thematic information present in the text responses collected through open ended surveys. We treat each response as a document, which we define as the i-th instance (exemplar?) within the corpus. We define the corpus as the entire collection of documents (responses) of interest. 
 
-Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Once topics are computed, then the proportion of each topic within each document can be estimated.
+Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Words are not exclusive to a particular topic, but rather may occur in multiple topics. Once topics are computed, then the proportion of each topic within each document can be estimated.
+
+ %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
 
 (discussion of pLSI here) \citep{hofmann:1999} % pLSI requires increasing the number of parameters as the number of documents within a corpus increases, cannot assign probabilities beyond the dataset provided to fit the model, so can’t apply things like test/training set hold outs to test model, etc?
 
-Latent Dirichlet Allocation (LDA) \cite{blei2003} builds on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. It also avoids the increase in the number of estimated parameters as the number of documents increases. Blei and  ___’s work 
+Latent Dirichlet Allocation (LDA) \cite{blei2003} builds on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. It also avoids the increase in the number of estimated parameters as the number of documents increases. Blei, Ng and  Jordan treat each document as a bag of words in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of interest here. And what is gained by this bag of words approach is allowing exchangabilty and independence in .. (?)   %\hh{define exchangeability and independence in the context of LDA}
 
+Blei futher builds on LDA, addressing the somewhat unrealistic expectation in large collections of documents that there is no correlation among topics or documents, with the introduction of Correlated Topic models \citep{Blei:2007jy}. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. Thus, correlated topic models build on LDA by relaxing the independence assumption.
+%\hh{give the math of how this independence assumption is relaxed.}
 
-%Topic models attempt to bring some reliable level of automation to quantifying the thematic information present in the text responses collected through open ended surveys. We define each response as a document and the specific set of survey responses as our corpus. To determine the thematic content of the documents and the corpus,  with the goal of estimating the proportions with which those themes, which we define as topics, occur within the documents of the corpus. %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
-
- "Simple" Latent Dirichlet Allocation is the base form of this method, built on the common assumptions of exchangeability and independence. %exchangability - conditional independence, ith and jth instances can be switched, order doesn't matter
- Obviously, the order of the words as they appear does matter for English syntax, but LDA treats each document as a ``bag of words", essentially ignoring syntactic information and focusing entirely on the semantic information.
- Unsupervised classification problem in machine learning (topics are not known before hand)
- %\hh{define exchangeability and independence in the context of LDA}
-
-%\hh{what data are LDA models dealing with? - give an example. the xkcd data would be good for the intro. }
-%\hh{what is the goal of an LDA analysis? }
-
-Unlike previous probabilistic methods to model documents, such as probabilistic latent semantic indexing \citep{hofmann:1999}, LDA is a (vast/stark?) improvement because it can assign probabilities beyond the documents included when the model was fit to documents not originally included. pLSI also requires increasing the number of parameters as the number of documents within a corpus increases.
-%\hh{ give an example (with citation) of a previous method}
-
-A major limitation of the original LDA is its inability to incorporate correlation across topics. 
-In practice, independence between documents is an unrealistic expectation when dealing with large sets of documents. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. 
-Correlated topic models build on LDA by relaxing the independence assumption \citep{Blei:2007jy}. %(cite blei/lafferty 2007) %\hh{give the math of how this independence assumption is relaxed.} 
-
-Structural topic models further build on the additions of correlated topic models by incorporating document level covariates, such as particular characteristics of the author(s) \citep{stm2013}. %\hh{please give an example here - it's getting very abstract.}
-
-For example, in the ANES dataset, document level covariates include the respondent's gender, race, and/or party affiliation.
+Structural Topic Models (STM) \cite{stm2013} further builds on this work by allowing for the inclusion of document level covariates. In the open ended surveys we analyze, such covariates include demographic information about the respondent, such as race, gender, age, and/or party affiliation.
+%\hh{please give an example here - it's getting very abstract.}
 
 \citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
 to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
+
+
 
 % with LDA, priors for topics and words are dirichlets, whereas with STM, priors for toopics are Normal-Gamma topic and Gamma Lasso for kappa 
 
