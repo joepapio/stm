@@ -50,7 +50,7 @@ The immediate benefit of the traditional survey forms is that once the data are 
 Until the last decade or so, little existed in the way of automated processing or analysis of open ended surveys. Identification and analysis of the content of the responses often requires a large number of person-hours, in which trianed readers go through individual responses, using their judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those predetermined areas. %Which is to say, the application of of this processing via human readers might introduce bias into the results through the predetermined list of topic options.
 
 
-%Enter topic models, pLSI (Hoffman) then LDA (Blei)
+%Enter topic models, pLSI (Hoffman) then LDA (Blei), then STM
 Topic models attempt to bring some reliable level of automation to quantifying the thematic information present in the text responses collected through open ended surveys. We treat each response as a document, which we define as the i-th instance (exemplar?) within the corpus. We define the corpus as the entire collection of documents (responses) of interest. 
 
 Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Words are not exclusive to a particular topic, but rather may occur in multiple topics. Once topics are computed, then the proportion of each topic within each document can be estimated.
@@ -71,19 +71,18 @@ Structural Topic Models (STM) \cite{stm2013} further builds on this work by allo
 to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
 
 
-
 % with LDA, priors for topics and words are dirichlets, whereas with STM, priors for toopics are Normal-Gamma topic and Gamma Lasso for kappa 
 
 
 \section{Methods}
-apply LDA (similar to xkcd) to ANES data without taking respondent information into account
+apply STM to xkcd dataset, using fake "group" variable 
 then apply STM to ANES data, taking respondent information into account and compare
 
 \section{Applications}
 
 \subsection{xkcd}
 
-The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable ``group" was added, dividing the corpus into 11 groups of 115 documents each by simply taking the first 115 documents and calling them ``group 1", the second 115 documents ``group 2", and so forth. \hh{this group variable will capture some time component, right?}
+The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable "group" was added, dividing the corpus into 11 groups of 115 documents each by simply taking the first 115 documents and calling them "group 1", the second 115 documents "group 2", and so forth. This variable loosely conveys some aspects of time, since the comics are arranged in the order in which they were published. %\hh{this group variable will capture some time component, right?}
 
 Prior to fitting models to the open ended text corpus, the documents must first undergo some basic text preprocessing. For the xkcd dataset, documents begin as one or more sentences plus some descriptive text, a transcription:
 
