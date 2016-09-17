@@ -26,6 +26,7 @@ library(stm)
 library(stringi)
 library(Rtsne)
 library(geometry)
+library(stmBrowser)
 
 set.seed(11123)
 
@@ -59,14 +60,16 @@ Topics, then, exist within the corpus, as groups of words which have high co-occ
 
  %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
 
-(discussion of pLSI here) \citep{hofmann:1999} % pLSI requires increasing the number of parameters as the number of documents within a corpus increases, cannot assign probabilities beyond the dataset provided to fit the model, so can’t apply things like test/training set hold outs to test model, etc?
+An early example of the efforts at to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. But PLSI requires increasing the number of parameters as the number of documents within a corpus increases and cannot reliably assign probabilities beyond the dataset provided to fit the model. Despite these limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
+%so can’t apply things like test/training set hold outs to test model, etc?
 
-Latent Dirichlet Allocation (LDA) \cite{LDA2003} builds on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. It also avoids the increase in the number of estimated parameters as the number of documents increases. Blei, Ng and  Jordan treat each document as a bag of words in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of interest here. And what is gained by this bag of words approach is allowing exchangabilty and independence in .. (?)   %\hh{define exchangeability and independence in the context of LDA}
+Latent Dirichlet Allocation (LDA) \cite{LDA2003} builds on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. It also avoids the increase in the number of estimated parameters as the number of documents increases. Blei, Ng and Jordan treat each document as a bag of words in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of interest. Thus what is gained by this bag of words approach, namely allowing exchangabilty and independence in .. (?), is outweighed by that minimal loss.   
+%\hh{define exchangeability and independence in the context of LDA}
 
 Blei futher builds on LDA, addressing the somewhat unrealistic expectation in large collections of documents that there is no correlation among topics or documents, with the introduction of Correlated Topic models \citep{Blei:2007jy}. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. Thus, correlated topic models build on LDA by relaxing the independence assumption.
 %\hh{give the math of how this independence assumption is relaxed.}
 
-Structural Topic Models (STM) \cite{stm2013} further builds on this work by allowing for the inclusion of document level covariates. In the open ended surveys we analyze, such covariates include demographic information about the respondent, such as race, gender, age, and/or party affiliation.
+Structural Topic Models (STM) \cite{stm2013} further builds on this framework by allowing for the inclusion of document level covariates. In the open ended surveys we analyze, such covariates include demographic information about the respondent, such as race, gender, age, and/or party affiliation.
 %\hh{please give an example here - it's getting very abstract.}
 
 \citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
@@ -189,6 +192,11 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 @
 \caption{\label{stm-plot} Expected topic proportions and highest frequency words for xkcd dataset}
 \end{figure}
+
+<<stmviz, echo=FALSE>>=
+stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
+@
+
 
 \subsection{ANES}
 
