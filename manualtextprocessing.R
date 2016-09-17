@@ -1,7 +1,7 @@
 
 library(tm)
 library(ngram)
-library(RWeka)
+#library(RWeka)
 library(quanteda)
 library(RColorBrewer)
 library(stm)
@@ -174,3 +174,6 @@ as.matrix(mydfm)[c(30,612),40:50]
 stmFit4 <- stm(stmdfm$documents, stmdfm$vocab, K=4, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
 labelTopics(stmFit4, topics=1:4)
 plot.STM(stmFit4, type = "summary",  xlim = c(0, .5))
+
+
+stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
