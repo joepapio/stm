@@ -212,11 +212,7 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 
 Set up from stm2013 article
 
-$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
 
-$\gamma_k$ is the prior for the kth topic mean
-
-$\sigma^2_k$ is the prior for the kth topic variance
 
 \centering Topic Prevalence:
 \begin{align*}
@@ -225,6 +221,12 @@ $\sigma^2_k$ is the prior for the kth topic variance
 	\sigma_k^2 &\sim Gamma(s^{\gamma}, r^{\gamma})
 \end{align*}
 
+$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
+
+$\gamma_k$ is the prior for the kth topic mean
+
+$\sigma^2_k$ is the prior for the kth topic variance
+
 \centering Language Model:
 \begin{align*}
 \theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
@@ -232,12 +234,23 @@ z_{d,n} &\sim Mult(\theta_d)\\
 w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
 \end{align*}
 
+$\theta_d$ is the vector of topic proportions, and the prior for $z_{d,n}$
+
+$z_{d,n} $ is latent variable for the nth word in the d-th document? (and the prior for $w_{d,n}$? connection to the topics?)
+
+$w_{d,n}$ is the observed occurance of the nth word in the d-th document
+
+
 \centering Topical Content:
 \begin{align*}
 \beta_{d,v}^k &\propto exp(m_v+\kappa_v^{.,k}+\kappa_v^{y,.}+\kappa_v^{y,k}) \\
 \kappa_v^{y,k} &\sim Laplace(0,\tau_v^{y,k})\\
 \tau_v^{y,k} &\sim Gamma(s^{\kappa}, r^{\kappa})
 \end{align*}
+
+
+$\beta_{d,v}^k$ is the sum of the covariate effects?, and a prior for $w_{d,n}$
+
 
 slightly different set up from Roberts, Stewart, Airoldi 
 %I think they're basically the same but just slightly different notation. need to match them up
