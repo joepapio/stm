@@ -72,6 +72,8 @@ Blei futher builds on LDA, addressing the somewhat unrealistic expectation in la
 Structural Topic Models (STM) \cite{stm2013} further builds on this framework by allowing for the inclusion of document level covariates. In the open ended surveys we analyze, such covariates include demographic information about the respondent, such as race, gender, age, and/or party affiliation.
 %\hh{please give an example here - it's getting very abstract.}
 
+%%Roberts et al 2013 also reference Sparce Additive Generative topic models (eisenstein et al 2011) and Dirchilet-Multinomial Regression topic models (mimno and mccallum 2008) as parts of what they build on to develop STM - need to skim these articles and see how they fit in
+
 \citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
 to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
 
@@ -194,7 +196,8 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 \end{figure}
 
 <<stmviz, echo=FALSE>>=
-stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
+#stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
+#haven't figured this out yet
 @
 
 
@@ -207,6 +210,14 @@ stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
 
 \hh{you'll need to define every symbol and index that you use.}
 
+Set up from stm2013 article
+
+$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
+
+$\gamma_k$ is the prior for the kth topic mean
+
+$\sigma^2_k$ is the prior for the kth topic variance
+
 \centering Topic Prevalence:
 \begin{align*}
 	\mu_{d,k} &= X_d\gamma_k \\
@@ -216,7 +227,7 @@ stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
 
 \centering Language Model:
 \begin{align*}
-\theta_{d} &= LogisticNormal(\mu_d, \Sigma) \\
+\theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
 z_{d,n} &\sim Mult(\theta_d)\\
 w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
 \end{align*}
@@ -228,8 +239,19 @@ w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
 \tau_v^{y,k} &\sim Gamma(s^{\kappa}, r^{\kappa})
 \end{align*}
 
+slightly different set up from Roberts, Stewart, Airoldi 
+%I think they're basically the same but just slightly different notation. need to match them up
+% http://scholar.princeton.edu/files/bstewart/files/stm.pdf
 
+Matrix of topic pravalence covariates denoted X with dimension D x P and matrix of topical content covariates denoted Y with dimension D x A
 
+\begin{align*}
+	\gamma_k &\sim Normal_P(0, \sigma^2_kI_P) \\
+	\mathbf{\theta_d}&\sim LogisticNormal_{K-1}(\mathbf{\Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
+	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d)\\
+	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n})\\
+	\beta_{d,k,v} &= \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } ) } 
+\end{align*}
 
 
 
