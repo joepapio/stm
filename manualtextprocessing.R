@@ -8,6 +8,7 @@ library(stm)
 library(stringi)
 library(Rtsne)
 library(geometry)
+#library(topicmodels)
 
 #using TM package - probably need to redo this using the stringi package, since quanteda uses functions from
 #that package instead of TM package
@@ -125,10 +126,15 @@ plot(mydfm, max.words = 100, colors = brewer.pal(6, "Dark2"), scale = c(8, .5))
 
 
 
-# mydfmG <- dfm(myCorpus, groups = "group", ignoredFeatures=c(stopwords("english"), "title"), stem=TRUE, ngrams=c(1,2), 
+# mydfmG <- dfm(myCorpus, groups = "group", ignoredFeatures=c(stopwords("english"), "title", "text", "alt"), stem=TRUE, ngrams=c(1,2),
 #              removeNumbers=TRUE, removePunct=TRUE,removeSeparators=TRUE)
 # 
 # mydfmG <- trim(mydfmG, minCount = 4)
+
+##clumps documents by groups, looks at frequency within each group
+#sort(mydfmG)[, 1:20]
+
+#plot(mydfmG, max.words = 100, colors = brewer.pal(6, "Dark2"), scale = c(8, .5))
 
 #convert document feture matrix into an STM object
 stmdfm <- convert(mydfm, to="stm",
@@ -177,3 +183,41 @@ plot.STM(stmFit4, type = "summary",  xlim = c(0, .5))
 
 
 stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
+
+
+
+
+#### play with tfidf
+colnames(mydfm)[order((tfidf(mydfm)))[1:20]]
+
+mytfidf <- tfidf(mydfm)
+
+#this does the same thing
+topfeatures(mydfm, 20)
+
+
+tfidf(mydfm)
+
+
+mydfm.gram <- dfm(myCorpus, stem=TRUE, ngrams=c(2,3,4,5), 
+             removeNumbers=TRUE, removePunct=TRUE,
+             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text", "alt"))
+
+mydfm.gram <- trim(mydfm.gram, minCount=4, minDoc=2)
+
+tfidf.gram <- tfidf(mydfm.gram)
+
+topfeatures(mydfm.gram, 40)
+
+colnames(mydfm.gram)[order(tfidf.gram)[1:20]]
+
+##how to see frequencies tho..?
+
+########
+
+myDistMat <- dist(as.matrix(weight(mydfm, "relFreq")))
+myCluster <- hclust(myDistMat)
+myCluster$labels <- docnames(mydfm)
+plot(myCluster, xlab="", sub="", main="euclidean distance on normalized token frequenc")
+
+similarity(mydfm, c("man", "person", "woman"), method="cosine", margin = "features", n=20)
