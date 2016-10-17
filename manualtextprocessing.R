@@ -9,6 +9,7 @@ library(stringi)
 library(Rtsne)
 library(geometry)
 #library(topicmodels)
+library(stmBrowser)
 
 #using TM package - probably need to redo this using the stringi package, since quanteda uses functions from
 #that package instead of TM package
@@ -94,7 +95,10 @@ summary(myCorpus, n=5)
 
 
 #add dummy meta data
-docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
+##group as a continuous rather than categorical variable
+docvars(myCorpus, "group") <- as.numeric(rep(1:11,each=115))
+##group as a categorical variable
+#docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
 summary(myCorpus, n=5, showmeta=TRUE)
 
 head(docvars(myCorpus))
@@ -107,7 +111,7 @@ head(docvars(myCorpus))
 # ngram <-ngrams(tokens, n=1:2)
 
 #create document term matrix, with 1-grams and 2-grams
-mydfm <- dfm(myCorpus, stem=TRUE, ngrams=c(1,2), 
+mydfm <- dfm(myCorpus, stem=TRUE, #ngrams=c(1,2), 
              removeNumbers=TRUE, removePunct=TRUE,
              removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text"))
 
@@ -145,8 +149,9 @@ stmdfm <- convert(mydfm, to="stm",
 #need to read more about how "spectral" works
 stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
 
+stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
 
-
+stmCfit
 
 head(stmFit$vocab,20)
 length(stmFit$vocab)
@@ -157,11 +162,22 @@ length(stmFit$vocab)
 labelTopics(stmFit, topics=1:10)
 
 # "estimated topic proportions"
-plot.STM(stmFit, type = "summary", xlim = c(0, .3))
+plot.STM(stmFit, type = "summary", xlim = c(0, .3),)
 
 # thought <- findThoughts(stmFit, topics=c(1,3), n=2, texts=stmFit$documents)
 # 
 # plotQuote(thought$docs[[10]], width=30)
+
+stor <- estimateEffect(1:10 ~ group, stmFit, meta=stmdfm$meta)
+
+#names(stor)
+
+plot.estimateEffect(stor, covariate="group", topics = c(1,2), model=stmFit)
+plot.estimateEffect(stor, covariate="group", topics = c(3,4), model=stmFit)
+plot.estimateEffect(stor, covariate="group", topics = c(5,6), model=stmFit)
+plot.estimateEffect(stor, covariate="group", topics = c(7,8), model=stmFit)
+plot.estimateEffect(stor, covariate="group", topics = c(9,10), model=stmFit)
+
 
 #see footnote 11 on page 10 of STM vignette
 #setting K=0 uses an algorithm from another paper (Lee/Mimno 2014), allowing 
@@ -182,7 +198,7 @@ labelTopics(stmFit4, topics=1:4)
 plot.STM(stmFit4, type = "summary",  xlim = c(0, .5))
 
 
-stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
+stmBrowser(stmFit, data=stmdfm$meta, c("group"), text="text")
 
 
 
