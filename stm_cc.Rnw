@@ -27,8 +27,18 @@ library(stringi)
 library(Rtsne)
 library(geometry)
 library(stmBrowser)
+library(dplyr)
+library(tidytext )
+library(reshape)
 
-set.seed(11123)
+library(lda)
+
+#library(topicmodels)
+#library(Matrix)
+
+#library(textir)
+
+#set.seed(1332)
 
 dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("character","character"), col.names=c("url","text"),quote="")
 
@@ -152,10 +162,11 @@ print(str_break(ex2f))
 <<examples2, cache=TRUE, echo=FALSE, message=FALSE, verbose=FALSE, results='hide'>>=
 #convert vector from dataframe into an corpus for quanteda package
 myCorpus <- corpus(dfTranscripts$text)
-docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
+#docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
+docvars(myCorpus, "group") <- as.numeric(rep(1:11,each=115))
 
 #create document feature matrix, with 1-grams and 2-grams
-mydfm <- dfm(myCorpus, stem=TRUE, ngrams=c(1,2), 
+mydfm <- dfm(myCorpus, stem=TRUE, #ngrams=c(1,2), 
              removeNumbers=TRUE, removePunct=TRUE,
              removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text"))
 
@@ -169,6 +180,12 @@ stmdfm <- convert(mydfm, to="stm",
                   docvars=data.frame(group=docvars(myCorpus, "group")))
 
 stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
+
+
+stor <- estimateEffect(1:10 ~ group, stmFit, meta=stmdfm$meta)
+
+#names(stor)
+
 
 @
 
@@ -186,7 +203,7 @@ as.matrix(mydfm)[c(30,612),40:50]
 
 @
 
-From here, the STM package (or LDA package) can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed. 
+From here, the STM package (or LDA package) can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed. In Figure \ref{stm-plot}, we see the topics, ordered from highest to lowest proportion. The three highest occurence words are included with each topic. Topic numbers are not in any particular order.
 
 \begin{figure}
 <<examples4, echo=FALSE>>=
@@ -199,6 +216,186 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3))
 #stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
 #haven't figured this out yet
 @
+
+In Figure \ref{xkcdFX1}, we observe the first two topics and their proportions. Each group of comics happens later than the one before it. Thus we can see that as time goes on, Topic 1 decreases in proportion while topic 2 remains essentially constant. Each point represents a point estimate for the prevelance (proportion) of that topic, with the line indicating an interval estimate. %need to look up what range of values that represents
+
+\begin{figure}
+<<xkcdFX1, echo=FALSE>>=
+plot.estimateEffect(stor, covariate="group", topics = c(1,2), 
+                    model=stmFit, labeltype = "custom", 
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                    xlim= c(0, .3),
+                    custom.labels=c('T1G1',
+                                    'T2G1',
+                                    'T1G2',
+                                    'T2G2',
+                                    'T1G3',
+                                    'T2G3',
+                                    'T1G4',
+                                    'T2G4',
+                                    'T1G5',
+                                    'T2G5',
+                                    'T1G6',
+                                    'T2G6',
+                                    'T1G7',
+                                    'T2G7',
+                                    'T1G8',
+                                    'T2G8',
+                                    'T1G9',
+                                    'T2G9',
+                                    'T1G10',
+                                    'T2G10',
+                                    'T1G11',
+                                    'T2G11'))
+
+@
+\caption{\label{xkcdFX1} estimated topic proportions for each comic "period", Topics 1 and 2}
+\end{figure}
+
+In Figure \ref{xkcdFX2}, we can see the third and fourth topics both increase somewhat gradually over time.
+
+\begin{figure}
+<<xkcdFX2, echo=FALSE>>=
+
+plot.estimateEffect(stor, covariate="group", topics = c(3,4), 
+                    model=stmFit, labeltype = "custom", 
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                     xlim= c(0, .3),
+                    custom.labels=c('T3G1',
+                                    'T4G1',
+                                    'T3G2',
+                                    'T4G2',
+                                    'T3G3',
+                                    'T4G3',
+                                    'T3G4',
+                                    'T4G4',
+                                    'T3G5',
+                                    'T4G5',
+                                    'T3G6',
+                                    'T4G6',
+                                    'T3G7',
+                                    'T4G7',
+                                    'T3G8',
+                                    'T4G8',
+                                    'T3G9',
+                                    'T4G9',
+                                    'T3G10',
+                                    'T4G10',
+                                    'T3G11',
+                                    'T4G11'))
+
+@
+\caption{\label{xkcdFX2} estimated topic proportions for each comic "period", Topics 3 and 4}
+\end{figure}
+
+In Figure \ref{xkcdFX3}, we see both topics remaining fairly stable.
+
+\begin{figure}
+
+<<xkcdFX3, echo=FALSE>>=
+
+plot.estimateEffect(stor, covariate="group", topics = c(5,6), 
+                    model=stmFit, labeltype = "custom", 
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                     xlim= c(0, .3),
+                    custom.labels=c('T5G1',
+                                    'T6G1',
+                                    'T5G2',
+                                    'T6G2',
+                                    'T5G3',
+                                    'T6G3',
+                                    'T5G4',
+                                    'T6G4',
+                                    'T5G5',
+                                    'T6G5',
+                                    'T5G6',
+                                    'T6G6',
+                                    'T5G7',
+                                    'T6G7',
+                                    'T5G8',
+                                    'T6G8',
+                                    'T5G9',
+                                    'T6G9',
+                                    'T5G10',
+                                    'T6G10',
+                                    'T5G11',
+                                    'T6G11'))
+
+@
+\caption{\label{xkcdFX3} estimated topic proportions for each comic "period", Topics 5 and 6}
+\end{figure}
+
+In Figure \ref{xkcdFX4}, we see topic 8 increasing slightly while topic 7 decreaseas slightly over time.
+
+
+\begin{figure}
+
+<<xkcdFX4, echo=FALSE>>=
+plot.estimateEffect(stor, covariate="group", topics = c(7,8), 
+                    model=stmFit, labeltype = "custom", 
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                     xlim= c(0, .3),
+                    custom.labels=c('T7G1',
+                                    'T8G1',
+                                    'T7G2',
+                                    'T8G2',
+                                    'T7G3',
+                                    'T8G3',
+                                    'T7G4',
+                                    'T8G4',
+                                    'T7G5',
+                                    'T8G5',
+                                    'T7G6',
+                                    'T8G6',
+                                    'T7G7',
+                                    'T8G7',
+                                    'T7G8',
+                                    'T8G8',
+                                    'T7G9',
+                                    'T8G9',
+                                    'T7G10',
+                                    'T8G10',
+                                    'T7G11',
+                                    'T8G11'))
+
+@
+\caption{\label{xkcdFX4} estimated topic proportions for each comic "period", Topics 7 and 8}
+\end{figure}
+
+In Figure \ref{xkcdFX5}, we see topic 10 remaining fairly stable, while topic 9 increases slightly with eacu subsequent group.
+
+\begin{figure}
+<<xkcdFX5, echo=FALSE>>=
+
+plot.estimateEffect(stor, covariate="group", topics = c(9,10), 
+                    model=stmFit, labeltype = "custom", 
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                     xlim= c(0, .3),
+                    custom.labels=c('T9G1',
+                                    'T10G1',
+                                    'T9G2',
+                                    'T10G2',
+                                    'T9G3',
+                                    'T10G3',
+                                    'T9G4',
+                                    'T10G4',
+                                    'T9G5',
+                                    'T10G5',
+                                    'T9G6',
+                                    'T10G6',
+                                    'T9G7',
+                                    'T10G7',
+                                    'T9G8',
+                                    'T10G8',
+                                    'T9G9',
+                                    'T10G9',
+                                    'T9G10',
+                                    'T10G10',
+                                    'T9G11',
+                                    'T10G11'))
+@
+\caption{\labe{xkcdFX5} estimated topic proportions for each comic "period", Topics 9 and 10}
+\end{figure}
 
 
 \subsection{ANES}

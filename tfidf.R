@@ -69,7 +69,7 @@ library(tm)
 
 library(dplyr)
 # library(janeaustenr)
- library(tidytext)
+library(tidytext)
 #   book_words <- austen_books() %>%
 #     unnest_tokens(word, text) %>%
 #   count(book, word, sort = TRUE) %>%

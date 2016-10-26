@@ -237,3 +237,36 @@ myCluster$labels <- docnames(mydfm)
 plot(myCluster, xlab="", sub="", main="euclidean distance on normalized token frequenc")
 
 similarity(mydfm, c("man", "person", "woman"), method="cosine", margin = "features", n=20)
+
+
+
+
+
+####plotting experiments
+
+plot.estimateEffect(stor, covariate="group", topics = c(7,8), 
+                    model=stmFit, labeltype = "custom", linecol=c(red, blue),
+                    xlab="Topic Proportion", main = "Change in topic proportions over time",
+                    custom.labels=c('T7G1',
+                                    'T8G1',
+                                    'T7G2',
+                                    'T8G2',
+                                    'T7G3',
+                                    'T8G3',
+                                    'T7G4',
+                                    'T8G4',
+                                    'T7G5',
+                                    'T8G5',
+                                    'T7G6',
+                                    'T8G6',
+                                    'T7G7',
+                                    'T8G7',
+                                    'T7G8',
+                                    'T8G8',
+                                    'T7G9',
+                                    'T8G9',
+                                    'T7G10',
+                                    'T8G10',
+                                    'T7G11',
+                                    'T8G11'))
+
