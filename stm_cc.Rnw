@@ -98,8 +98,11 @@ to open ended survey data from the ANES, collected in 2008. We futher apply thei
 
 
 \section{Methods}
-apply STM to xkcd dataset, using fake "group" variable 
-then apply STM to ANES data, taking respondent information into account and compare
+To explore the Structural Topic Model approach, first apply the package to a document term matrix for the xkcd corpus, using the groups covariate, which captures a temporal aspect of the comic strips, the groups numbered with smaller values preceeding the groups numbered with higher values. After identifying topics, the model then estimates the proportion (prevalence) of each topic within each group. Graphically we can then explore how those topic proportions increase, decrease, or remain the same as we proceed from the earlier groups to the later ones.
+
+Then with the American National Election Survey data, we will take the same approach, but utilizing individual and groups of covariates, including (race, gender, partisan affiliation, and election year) as available and applicable.
+
+
 
 \section{Applications}
 
