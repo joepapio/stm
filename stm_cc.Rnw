@@ -6,6 +6,8 @@
 
 \newcommand{\hh}[1]{{\color{magenta} #1}} 
 
+\newcommand{\jp}[1]{{\color{blue}#1}}
+
 \title{A tbd title for STM paper}
 \author{Joseph Eduardo Papio}
 
@@ -56,11 +58,15 @@ str_break = function(x, width = 70L) {
 
 \section{Introduction and Literature Review}
  
-Open ended survey responses provide an opportunity to solicit unguided opinions and ideas from participants, avoiding possible biases that can be introduced when utilizing more traditional survey forms. More traditional survey forms, on the other hand, require participants to select from several predetermined options in a closed set of choices. 
+Open ended survey responses provide an opportunity to solicit unguided opinions and ideas from participants, avoiding possible biases that can be introduced when utilizing more traditional survey forms in which respondents have to select their response out of several predetermined options in a closed set of choices. 
+
+
 
 The immediate benefit of the traditional survey forms is that once the data are collected, analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatiely low amounts of personnel and computing time. 
 
 Until the last decade or so, little existed in the way of automated processing or analysis of open ended surveys. Identification and analysis of the content of the responses often requires a large number of person-hours, in which trianed readers go through individual responses, using their judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those predetermined areas. %Which is to say, the application of of this processing via human readers might introduce bias into the results through the predetermined list of topic options.
+
+\jp{trying to get at the cutting edge detection of what's in the zeitgeist. not sure if it's coming across well tho.} This is particular of interest when detect nascent ideas in the population as they are emerging, something which the more traditional survey forms are not able to do. - Those building an instrument like an opinion survey must first be aware of an idea or an opinion before they can include it in future surveys. Depending on time to construction, there may be a significant lag. 
 
 
 %Enter topic models, pLSI (Hoffman) then LDA (Blei), then STM
@@ -394,7 +400,7 @@ plot.estimateEffect(stor, covariate="group", topics = c(9,10),
                                     'T9G11',
                                     'T10G11'))
 @
-\caption{\labe{xkcdFX5} estimated topic proportions for each comic "period", Topics 9 and 10}
+\caption{\label{xkcdFX5} estimated topic proportions for each comic "period", Topics 9 and 10}
 \end{figure}
 
 
@@ -404,6 +410,16 @@ plot.estimateEffect(stor, covariate="group", topics = c(9,10),
 
 %could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
 
+
+
+
+
+
+\bibliographystyle{asa}
+\bibliography{references}
+
+
+\end{document}
 
 \hh{you'll need to define every symbol and index that you use.}
 
@@ -462,11 +478,3 @@ Matrix of topic pravalence covariates denoted X with dimension D x P and matrix 
 	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n})\\
 	\beta_{d,k,v} &= \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } ) } 
 \end{align*}
-
-
-
-\bibliographystyle{asa}
-\bibliography{references}
-
-
-\end{document}

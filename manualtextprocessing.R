@@ -245,7 +245,7 @@ similarity(mydfm, c("man", "person", "woman"), method="cosine", margin = "featur
 ####plotting experiments
 
 plot.estimateEffect(stor, covariate="group", topics = c(7,8), 
-                    model=stmFit, labeltype = "custom", linecol=c(red, blue),
+                    model=stmFit, labeltype = "custom", #linecol=c(red, blue),
                     xlab="Topic Proportion", main = "Change in topic proportions over time",
                     custom.labels=c('T7G1',
                                     'T8G1',
