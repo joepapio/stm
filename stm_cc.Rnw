@@ -215,6 +215,8 @@ as.matrix(mydfm)[c(30,612),40:50]
 
 From here, the STM package  can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed in a variety of ways. In Figure \ref{stm-plot}, we see the topics, ordered from highest to lowest proportion. The three highest occurence words are included with each topic. Note that topic numbers are not in any particular order.
 
+\jp{using estimateeffect, can generate plots. but not sure how to extract parameter estimates from the model yet if it's even possible?}
+
 \begin{figure}[H]
 <<examples4, echo=FALSE>>=
 plot.STM(stmFit, type = "summary", xlim = c(0, .3))

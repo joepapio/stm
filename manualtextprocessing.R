@@ -170,6 +170,34 @@ plot.STM(stmFit, type = "summary", xlim = c(0, .3),)
 
 stor <- estimateEffect(1:10 ~ group, stmFit, meta=stmdfm$meta)
 
+stor1 <- estimateEffect(1 ~ group, stmFit, meta=stmdfm$meta, uncertainty = "None")
+
+test <- estimateEffect(c(1,7) ~group, stmFit, meta=stmdfm$meta, uncertainty = "None")
+
+plot.estimateEffect(stor, covariate="group", model=stmFit, method="continuous", topics = c(3,4))
+
+
+##for loop to extract topic parameters for group from "estimate effect" object
+parms<- NULL
+parms$int <- NULL
+parms$slope <- NULL
+
+for (i in 1:10){
+  parms$int[i]<- (stor$parameters[[i]][[i]])$est[1]
+  parms$slope[i] <- (stor$parameters[[i]][[i]])$est[2]
+}
+parms<- as.data.frame(parms)
+
+ggplot() + scale_y_continuous(limits=c(0,.3))+ scale_x_continuous(limits=c(1,11))+
+  geom_abline(data=parms,aes(slope=slope,intercept=int))
+
+#extract parameters for topic 1
+t1.int <- (stor1$parameters[[1]][[1]])$est[1]
+t1.slope <- (stor1$parameters[[1]][[1]])$est[2]
+
+(stor$parameters[[4]][[4]])$est[1]
+(stor$parameters[[4]][[4]])$est[2]
+
 #names(stor)
 
 plot.estimateEffect(stor, covariate="group", topics = c(1,2), model=stmFit)
@@ -248,6 +276,11 @@ plot.estimateEffect(stor, covariate="group", topics = c(1,2,7,8), method= "conti
                     xlab="Group (Time)", 
                     main = "Change in topic proportions over time")
 
+
+plot.estimateEffect(stor1, covariate="group", topics = c(1,2,7,8), method= "continuous",
+                    model=stmFit, #labeltype = "custom", #linecol=c(red, blue),
+                    xlab="Group (Time)", 
+                    main = "Change in topic proportions over time")
 
 plot.estimateEffect(stor, covariate="group", topics = c(7,8), method= "continuous",
                     model=stmFit, #labeltype = "custom", #linecol=c(red, blue),
