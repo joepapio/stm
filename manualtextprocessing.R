@@ -176,27 +176,33 @@ test <- estimateEffect(c(1,7) ~group, stmFit, meta=stmdfm$meta, uncertainty = "N
 
 plot.estimateEffect(stor, covariate="group", model=stmFit, method="continuous", topics = c(3,4))
 
+plot.estimateEffect(stor, covariate="group", model=stmFit, method="continuous", topics = c(1:10))
 
 ##for loop to extract topic parameters for group from "estimate effect" object
 parms<- NULL
 parms$int <- NULL
 parms$slope <- NULL
 
+
 for (i in 1:10){
   parms$int[i]<- (stor$parameters[[i]][[i]])$est[1]
   parms$slope[i] <- (stor$parameters[[i]][[i]])$est[2]
 }
-parms<- as.data.frame(parms)
+#coerce to dataframe
+parms<- as.data.frame(parms) 
+parms$topic <- as.factor(seq(1,10,1))
 
+#plot topics using ggplot2  #less noisy than the native plots
 ggplot() + scale_y_continuous(limits=c(0,.3))+ scale_x_continuous(limits=c(1,11))+
-  geom_abline(data=parms,aes(slope=slope,intercept=int))
+  geom_abline(data=parms,aes(slope=slope,intercept=int, color=topic)) 
+
 
 #extract parameters for topic 1
-t1.int <- (stor1$parameters[[1]][[1]])$est[1]
-t1.slope <- (stor1$parameters[[1]][[1]])$est[2]
-
-(stor$parameters[[4]][[4]])$est[1]
-(stor$parameters[[4]][[4]])$est[2]
+# t1.int <- (stor1$parameters[[1]][[1]])$est[1]
+# t1.slope <- (stor1$parameters[[1]][[1]])$est[2]
+# 
+# (stor$parameters[[4]][[4]])$est[1]
+# (stor$parameters[[4]][[4]])$est[2]
 
 #names(stor)
 
