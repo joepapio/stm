@@ -19,9 +19,13 @@ grabEst <-function(FX){
       ktops <- length(FX$topics)
       
       #store list of covariates
-      vars <- FX$varlist
+      
+      
+      vlist <- map(FX$data, unique)
+      elems <- unlist(lapply(vlist,length ))
+      
       #store number of covariates
-      lvars <- length(vars)
+      lvars <- length(vlist)
       
       #number of cells for each topic
       numb <- prod(elems)
@@ -79,11 +83,10 @@ grabEst <-function(FX){
       res <- cbind(parms, stdev[,3])
       #rename
       names(res)[4] <- "sd"
-      ##print results
-      res
+
       
       for(j in 1:lvars){
-        res$Parameter <- gsub(vars[j], "", res$Parameter)
+        res$Parameter <- gsub(vlist[j], "", res$Parameter)
       }
     }
   }
@@ -94,15 +97,9 @@ grabEst <-function(FX){
 
 
 
-#create basic dataframe for each cell
-#dummy column to start dataframe
-scaff <- data.frame(rep(NA, length.out=numb))
 
-#add repeated strings of each variable level to generate each cell
-for (i in 1:lvars){
-  scaff <- cbind(scaff, rep(vlist[[i]][,1], length.out = numb ))  
-  names(scaff)[i+1] <-  names(vlist[[i]])
-}
+scaff <- data.frame(expand.grid(vlist))
+
 
 #drop dummy colum
 scaff <- scaff[,-1]
