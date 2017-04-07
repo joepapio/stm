@@ -76,7 +76,7 @@ grabEst <-function(FX){
       }
     }
   }
-} 
+
 
 ##beginning of second half of grabEst function
 
@@ -141,4 +141,6 @@ for (i in 1:ktops){
   }
   dframe <- rbind(dframe, scaffT)
   
+}
+dframe
 }
