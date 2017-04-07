@@ -15,6 +15,17 @@ grabEst <-function(FX){
       vcvm <- rep(list(NULL),length(FX[[2]]))
       vv <- NULL
       
+      ##store number of topics
+      ktops <- length(FX$topics)
+      
+      #store list of covariates
+      vars <- FX$varlist
+      #store number of covariates
+      lvars <- length(vars)
+      
+      #number of cells for each topic
+      numb <- prod(elems)
+      
       ###for loop to extract betas and stdevs from estimateEffect object for the i-th topic
       for (i in 1:length(FX[[2]])){
         parm1 <-   transpose(FX[[1]][[i]])$est %>% ##use purrr tranpose function to gather all parameter 
@@ -81,16 +92,7 @@ grabEst <-function(FX){
 ##beginning of second half of grabEst function
 
 
-##store number of topics
-ktops <- length(FX$topics)
 
-#store list of covariates
-vars <- FX$varlist
-#store number of covariates
-lvars <- length(vars)
-
-#number of cells for each topic
-numb <- prod(elems)
 
 #create basic dataframe for each cell
 #dummy column to start dataframe
