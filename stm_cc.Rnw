@@ -8,11 +8,11 @@
 
 \newcommand{\jp}[1]{{\color{blue}#1}}
 
-\title{A tbd title for STM paper}
+\title{Application and Exploration of the Structural Topic Model to the American National Election Studies' Open ended Survey Responses Regarding Major Party Presidential Candidates from 1984 to 2004}
+
 \author{Joseph Eduardo Papio}
 
 \begin{document}
-
 
 \maketitle
 
@@ -20,8 +20,6 @@
 opts_knit$set(self.contained=FALSE, cache=TRUE, width=40)
 
 library(tm)
-library(ngram)
-#library(RWeka)
 library(quanteda)
 library(RColorBrewer)
 library(stm)
@@ -52,256 +50,49 @@ str_break = function(x, width = 70L) {
   if (n %% width != 0) n2 = c(n2, n)
   substring(x, n1, n2)
 }
-
-
 @
 
-\section{Introduction and Literature Review}
+\section{Introduction, Motivation, and Literature Review}
+
+\subsection{Open Ended versus Traditional Surveys}
  
-Open ended survey responses provide an opportunity to solicit unguided opinions and ideas from participants, avoiding possible biases that can be introduced when utilizing more traditional survey forms in which respondents have to select their response out of several predetermined options in a closed set of choices. 
+Open ended survey questions provide an opportunity to solicit unguided opinions and ideas from participants, avoiding possible biases that can be introduced when utilizing more traditional survey forms in which respondents are prompted to select their answer from one of several predetermined options in a closed set of choices. 
 
+The immediate benefit of such traditional survey formats is that once the data are collected, analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatiely low amounts of personnel power and computational resources. However, by prompting respondents to select from among these predetermined choices, which must be decided upon by researchers prior to implementations, ideas which are already present in the political collective consciousness but not yet salient to researchers may be papered over and thus lost. Considering such information loss, exploration and application of of open ended (and thus "unprimed") survey responses is an area of great interest in the humanities and social sciences.
 
+However, because of the intense resource requirements needed for such analysis, little work has been done in the way of leveraging these open ended sources, despite a plethora of collected and available data. This is because identification and analysis of the content of these data often requires massive amounts of person-hours, in which trianed readers go through individual responses, using their judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those areas predetermined by researchers and their trained readers.
 
-The immediate benefit of the traditional survey forms is that once the data are collected, analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatiely low amounts of personnel and computing time. 
+However, as computing power increases, interest in the development, exploration and application of automated textual analysis methods such as topic models and the like will surely continue to grow, especially for humanities and social science researchers. Such interest is likely to be stronger with researchers who are required to first build survey instruments before interacting with respondents, as the time required to construct the instruments prior to deployment can introduce significant lag. During such time, nascent ideas forming within the population may be missed or detected by other researchers.
 
-Until the last decade or so, little existed in the way of automated processing or analysis of open ended surveys. Identification and analysis of the content of the responses often requires a large number of person-hours, in which trianed readers go through individual responses, using their judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those predetermined areas. %Which is to say, the application of of this processing via human readers might introduce bias into the results through the predetermined list of topic options.
+\subsection{pLSI, LDA, and STM}
 
-\jp{trying to get at the cutting edge detection of what's in the zeitgeist. not sure if it's coming across well tho.} This is particular of interest when detect nascent ideas in the population as they are emerging, something which the more traditional survey forms are not able to do. - Those building an instrument like an opinion survey must first be aware of an idea or an opinion before they can include it in future surveys. Depending on time to construction, there may be a significant lag. 
+Topic models, a subfield of Machaine Learning and Natural Language Processing, attempt to bring some level of automation, speed, and reliability to quantifying the latent thematic information present in the text responses collected through open ended surveys. 
 
+An early example of the efforts at to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
 
-%Enter topic models, pLSI (Hoffman) then LDA (Blei), then STM
-Topic models attempt to bring some reliable level of automation to quantifying the thematic information present in the text responses collected through open ended surveys. We treat each response as a document, which we define as the i-th instance (exemplar?) within the corpus. We define the corpus as the entire collection of documents (responses) of interest. 
-
-Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Words are not exclusive to a particular topic, but rather may occur in multiple topics. Once topics are computed, then the proportion of each topic within each document can be estimated.
-
- %(loosely topics are themes, and more technically, they are non exclusive clusters of words. distance between/within clusters is (?) computed based on the frequencies of word (co?)occurance within/across documents ) 
-
-An early example of the efforts at to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. But PLSI requires increasing the number of parameters as the number of documents within a corpus increases and cannot reliably assign probabilities beyond the dataset provided to fit the model. Despite these limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
-%so can’t apply things like test/training set hold outs to test model, etc?
-
-Latent Dirichlet Allocation (LDA) \cite{LDA2003} builds on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. It also avoids the increase in the number of estimated parameters as the number of documents increases. Blei, Ng and Jordan treat each document as a bag of words in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of interest. Thus what is gained by this bag of words approach, namely allowing exchangabilty and independence in .. (?), is outweighed by that minimal loss.   
-%\hh{define exchangeability and independence in the context of LDA}
+Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan treat each document as a "bag of words" in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of primary interest in fitting Topic Models. Thus what syntactic information is lost by this bag of words approach can be neglible for our purposes.   
 
 Blei futher builds on LDA, addressing the somewhat unrealistic expectation in large collections of documents that there is no correlation among topics or documents, with the introduction of Correlated Topic models \citep{Blei:2007jy}. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. Thus, correlated topic models build on LDA by relaxing the independence assumption.
-%\hh{give the math of how this independence assumption is relaxed.}
 
-Structural Topic Models (STM) \cite{stm2013} further builds on this framework by allowing for the inclusion of document level covariates. In the open ended surveys we analyze, such covariates include demographic information about the respondent, such as race, gender, age, and/or party affiliation.
-%\hh{please give an example here - it's getting very abstract.}
+Structural Topic Models (STM) \cite{stm2013} further builds on this framework by allowing for the inclusion of document level covariates. In the open ended surveys analyzed below, such covariates include demographic information about the respondent, such as their race, gender, age, and/or party affiliation.
 
-%%Roberts et al 2013 also reference Sparce Additive Generative topic models (eisenstein et al 2011) and Dirchilet-Multinomial Regression topic models (mimno and mccallum 2008) as parts of what they build on to develop STM - need to skim these articles and see how they fit in
+\citet{stm2013} apply their method of Structural Topic Modeling to open ended survey data from the American National Election Studies (ANES) collected in 2008 in which respondents were asked to identify the most important and second most important political problems facing the United States and personal issues in the election. 
 
-\citet{stm2013} apply their method of Structural Topic Modeling %\hh{what is their method?} 
-to open ended survey data from the ANES, collected in 2008. We futher apply their method to a larger amount of data from the ANES, open ended survey questions collected every presidential election year from 1948 through 2004. In addition to the open ended survey responses, basic demographic information was also collected, including the respondents' race, gender and political affiliation.
 
+\subsection{Words, Topics, and Documents}
 
-% with LDA, priors for topics and words are dirichlets, whereas with STM, priors for topics are Normal-Gamma topic and Gamma Lasso for kappa 
+We consider each response as a document, which we define as the \textit{d}-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all words or features present within the corpus. 
 
+Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Topics are the latent units of meaning from which each document is generated. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather occur in multiple topics with varying prevalence. Once the set of topics is computed, then the proportion of each topic within each document can be estimated.
 
-\section{Methods}
-To explore the Structural Topic Model approach, first apply the package to a document term matrix for the xkcd corpus, using the groups covariate, which captures a temporal aspect of the comic strips, the groups numbered with smaller values preceeding the groups numbered with higher values. After identifying topics, the model then estimates the proportion (prevalence) of each topic within each group. Graphically we can then explore how those topic proportions increase, decrease, or remain the same as we proceed from the earlier groups to the later ones.
 
-Then with the American National Election Survey data, we will take the same approach, but utilizing individual and groups of covariates, including (race, gender, partisan affiliation, and election year) as available and applicable.
 
-\jp{maybe this section is redundant and should be absorbed into either the applications or the intro?}
+\section{The Mathy Stuff}
 
+\jp{I'm still need to do a lot with this part, but I wanted to push what I had to the repo so I could get feedback at least on that part.}
 
-\section{Applications}
-
-\subsection{xkcd}
-
-The xkcd corpus consists of transcriptions of the first 1265 comics and artworks produced at xkcd.com. To act as a meta-document covariate, a dummy variable "group" was added, dividing the corpus into 11 groups of 115 documents each by simply taking the first 115 documents and calling them "group 1", the second 115 documents "group 2", and so forth. This variable loosely conveys some aspects of time, since the comics are arranged in the order in which they were published. %\hh{this group variable will capture some time component, right?}
-
-Prior to fitting models to the open ended text corpus, the documents must first undergo some basic text preprocessing. For the xkcd dataset, documents begin as one or more sentences plus some descriptive text, a transcription:
-
-<<examples1, echo=FALSE, tidy=TRUE>>=
-xTran <- Corpus(VectorSource(dfTranscripts$text))
-
-#inspect a few documents in the corpus
-cat("Comic 30:")
-print(str_break(as.character(xTran[[30]])))
-cat("Comic 612:")
-print(str_break(as.character(xTran[[612]])))
-
-#store to demonstrate chnages as text processing progresses
-ex1a <-as.character(xTran[[30]])
-ex2a <-as.character(xTran[[612]])
-
-#convert to lower case
-xTran <- tm_map(xTran, content_transformer(tolower))
-
-ex1b <-as.character(xTran[[30]])
-ex2b <-as.character(xTran[[612]])
-
-#remove stopwords, including "alt-title", which is in most of the comics as the mouse over text
-xTran <- tm_map(xTran, removeWords, c(stopwords("english"), "alt-title", "alt", "title"))
-
-ex1c <-as.character(xTran[[30]])
-ex2c <-as.character(xTran[[612]])
-
-#remove punctuation and numbers
-xTran <- tm_map(xTran, removePunctuation)
-xTran <- tm_map(xTran, removeNumbers)
-
-ex1d <-as.character(xTran[[30]])
-ex2d <-as.character(xTran[[612]])
-
-#stemming
-xTran <- tm_map(xTran, stemDocument)
-
-ex1e <-as.character(xTran[[30]])
-ex2e <-as.character(xTran[[612]])
-
-#remove any unnecessary white space
-xTran <- tm_map(xTran, stripWhitespace)
-
-ex1f <-as.character(xTran[[30]])
-ex2f <-as.character(xTran[[612]])
-
-
-@
-
-Then, the text is converted to lower case, the numbers and punctuation are removed, English stop words are removed, and the words are stemmed so that different forms of base words, like singular and plural instances, or different tenses, are counted as the same word. Lastly, any additional spacing between words is removed, resulting in a string of base forms for each document:
-
-<<print2, echo=FALSE, warning=FALSE, message=FALSE,  verbose=FALSE>>=
-cat("Comic 30:")
-print(str_break(ex1f))
-cat("Comic 612:")
-print(str_break(ex2f))
-@
-
-<<examples2, cache=TRUE, echo=FALSE, message=FALSE, verbose=FALSE, results='hide'>>=
-#convert vector from dataframe into an corpus for quanteda package
-myCorpus <- corpus(dfTranscripts$text)
-#docvars(myCorpus, "group") <- as.factor(rep(1:11,each=115))
-docvars(myCorpus, "group") <- as.numeric(rep(1:11,each=115))
-
-#create document feature matrix, with 1-grams and 2-grams
-mydfm <- dfm(myCorpus, stem=TRUE, #ngrams=c(1,2), 
-             removeNumbers=TRUE, removePunct=TRUE,
-             removeSeparators=TRUE, ignoredFeatures=c(stopwords("english"), "title", "text"))
-
-#remove words with less than 4 occurances and in only one document
-mydfm <- trim(mydfm, minCount=4, minDoc=2)
-
-#further trim to include 5 or more occurances and in at least two docs
-mydfm <- trim(mydfm, minCount=5, minDoc=3)
-
-stmdfm <- convert(mydfm, to="stm",
-                  docvars=data.frame(group=docvars(myCorpus, "group")))
-
-stmFit <- stm(stmdfm$documents, stmdfm$vocab, K=10, prevalence= ~group, data=stmdfm$meta, init.type="Spectral" )
-
-
-stor <- estimateEffect(1:10 ~ group, stmFit, meta=stmdfm$meta)
-
-#names(stor)
-
-
-@
-
-After this, the corpus is converted into a document feature matrix consisting of the 1-gram and 2-gram tokens for each document, denoted $\mathcal{X}$. The \textit{d}-th row of this matrix represents the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. During this process, highly common n-grams which occur in all or almost all the documents are trimmed, as are highly uncommon n-grams which occur in only a very few number of documents. This cuts down on computation time with minimal loss of useful information, since very high frequency words can tell us little about what distinguishes documents in order to estimate topics and their prevalence, while very low frequency words can tell us little about what topics documents have in common.
-
-The resultant document feature matrix for the xkcd data set consists of 1265 rows, one for each document, and 2850 columns, one for each non trimmed n-gram remaining in the vocabulary. 
-%note the sparsity? As in the example lines, most of the elements in the document feature matrix are 0s.
-
-<<examples3, echo=FALSE>>=
-as.matrix(mydfm)[c(30,612),40:50]
-
-#Plot wordcloud
-#plot(mydfm, max.words = 100, colors = brewer.pal(6, "Dark2"), scale = c(8, .5))
-
-
-@
-
-From here, the STM package  can be applied to the data, and topics and their proportions in the documents and the corpus can be estimated and displayed in a variety of ways. In Figure \ref{stm-plot}, we see the topics, ordered from highest to lowest proportion. The three highest occurence words are included with each topic. Note that topic numbers are not in any particular order.
-
-\jp{using estimateeffect, can generate plots. but not sure how to extract parameter estimates from the model yet if it's even possible?}
-
-\begin{figure}[H]
-<<examples4, echo=FALSE>>=
-plot.STM(stmFit, type = "summary", xlim = c(0, .3))
-@
-\caption{\label{stm-plot} Expected topic proportions and highest frequency words for xkcd dataset}
-\end{figure}
-
-<<stmviz, echo=FALSE>>=
-#stmBrowser(stmFit, data=stmdfm$meta, group, text="text")
-#haven't figured this out yet
-@
-
-If a covariate is categorical, it can be displayed as seen in Figure \ref{xkcdFX1}. Here we observe the first two topics and their proportions. Each group of comics happens later than the one before it. Thus we can see that as time goes on, Topic 1 decreases in proportion while topic 2 remains essentially constant. Each point represents a point estimate for the prevelance (proportion) of that topic, with the line indicating an interval estimate. %need to look up what range of values that represents
-
-\begin{figure}[H]
-<<xkcdFX1, echo=FALSE>>=
-plot.estimateEffect(stor, covariate="group", topics = c(1,2), 
-                    model=stmFit, labeltype = "custom", 
-                    xlab="Topic Proportion", main = "Change in topic proportions over time",
-                    xlim= c(0, .3),
-                    custom.labels=c('T1G1',
-                                    'T2G1',
-                                    'T1G2',
-                                    'T2G2',
-                                    'T1G3',
-                                    'T2G3',
-                                    'T1G4',
-                                    'T2G4',
-                                    'T1G5',
-                                    'T2G5',
-                                    'T1G6',
-                                    'T2G6',
-                                    'T1G7',
-                                    'T2G7',
-                                    'T1G8',
-                                    'T2G8',
-                                    'T1G9',
-                                    'T2G9',
-                                    'T1G10',
-                                    'T2G10',
-                                    'T1G11',
-                                    'T2G11'))
-
-@
-\caption{\label{xkcdFX1} estimated topic proportions for each comic "period", Topics 1 and 2}
-\end{figure}
-
-
-Alternatively, if a covariate is continous, the change in topics can be displayed as seen in \ref{xkcdFX6}. The midline for eac cluster gives a  point estimate whereas the lines on either side indicate a confidence interval.
-
-
-\begin{figure}[H]
-<<xkcdFX6, echo=FALSE>>=
-plot.estimateEffect(stor, covariate="group", topics = c(1,2,7,8), method= "continuous",
-                    model=stmFit, #labeltype = "custom", #linecol=c(red, blue),
-                    xlab="Group (Time)", 
-                    main = "Change in topic proportions over time")
-@
-\caption{\label{xkcdFX6} Estimated proportions for topics 1, 2, 7, and 8}
-\end{figure}
-
-\subsection{ANES}
-
-\section{Conclusion}
-
-%could also reference dynamic topic models (blei, lafferty 2006) which adds a temporal  element to the model, since data are collected over time. \hh{are you planning to model the temporal aspect? If not, this would be better in the conclusions and future work statement.}
-
-
-
-
-
-
-\bibliographystyle{asa}
-\bibliography{references}
-
-
-\end{document}
-
-\hh{you'll need to define every symbol and index that you use.}
-
-Set up from stm2013 article
-
-
-
-\centering Topic Prevalence:
+\begin{centering} 
+Topic Prevalence:
 \begin{align*}
 	\mu_{d,k} &= X_d\gamma_k \\
 	\gamma_k &\sim \mathcal{N}(0,\sigma_k^2)\\
@@ -314,18 +105,109 @@ $\gamma_k$ is the prior for the kth topic mean
 
 $\sigma^2_k$ is the prior for the kth topic variance
 
-\centering Language Model:
+Language Model:
 \begin{align*}
 \theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
 z_{d,n} &\sim Mult(\theta_d)\\
 w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
 \end{align*}
 
+\end{centering}
+
 $\theta_d$ is the vector of topic proportions, and the prior for $z_{d,n}$
 
 $z_{d,n} $ is latent variable for the nth word in the d-th document? (and the prior for $w_{d,n}$? connection to the topics?)
 
 $w_{d,n}$ is the observed occurance of the nth word in the d-th document
+
+
+Matrix of topic pravalence covariates denoted X with dimension D x P and matrix of topical content covariates denoted Y with dimension D x A
+
+
+\begin{centering}
+
+\begin{align*}
+	\gamma_k &\sim Normal_P(0, \sigma^2_kI_P) \\
+	\mathbf{\theta_d}&\sim LogisticNormal_{K-1}(\mathbf{\Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
+	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d)\\
+	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n})\\
+	\beta_{d,k,v} &= \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } ) } 
+\end{align*}
+
+\end{centering}
+
+\section{Application}
+
+\subsection{Data: American National Election Studies}
+
+The like/dislike questions of the ANES open ended responses have been collected over many years, but due to the high cost of analysis referenced above, little has been done with these data. I apply the Structural Topic Model method to a subset of these open ended surveys, which were collected during presidential election years, from Ronald Reagan's reelection campaign of 1984 to George W. Bush's reelection campaign of 2004. For each of the two major party candidates, respondents are asked to idenitify what they liked or disliked about that candidate. Although the ANES also collected similar responses on the independent candidate, Ross Perrott, in 1992 and 1996, I have omitted these data from the analysis so the parameters fit for each year are cnosistent. In addition to the open ended survey responses, the ANES also collects basic demographic information on each respondent. As potential prevalence covariates, I explore the year the respones were collected, as well as the respondents' race, gender, political affiliation, church attendence, educational attainment, income percentile, and ideology.
+
+\subsection{Text Pre-Processing}
+
+\jp{I'll add some examples using a few of the exemplar texts I pulled.}
+
+To prepare the open ended survey respones for analysis, I first applied some basic text preprocessing. Although the STM package includes some functions from the text mining (tm) package, I opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved removing as much punctuation as possible, stemming so that words like "immigrant" and "immigrants" and "immigration" were recognized as a single feature rather than three separate ones, partial 2-gramming so that phrases like "vice president" were treated as a single feature rather than two separate features, removal of a standard list of stop words as well as a few "words" particular to this dataset (like "ae", indicating the interviewer asked "Anything else?"), and removing very low frequency words ( $ n \leq 3 $ instances ) which might slow computation but add nothing to the interpretability of the model. 
+
+After this preprocessing of the coprus, the remaining dataset contains 23,522 instances of open ended responses with counts for 3,357 features (one-grams and selected two-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
+
+This process yeilds a document feature matrix, denoted $ \mathcal{X} $, in which the \textit{d}-th row corresponds to the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+
+\subsection{Model}
+
+After fitting models with various numbers of topics, I settled on models using $K=60$ topics. This is close to the number of topics ($K=69$) which Roberts et al (cite) fit for their analysis of a open ended survey data from 2008, for which they were able to obtain and compare hand coded analysis.
+
+As a baseline model, I fit just the election year as a covariate. Rather than fitting this as a linear coefficient, I opted for a categorical variable to avoid forcing the prevalence of a given topic to either strictly increase or strictly decrease over time.
+
+A second baseline model incorporated the party identification of the respondent, as well as interactions between this covariate and the year. 
+
+In addition to the year and respondent's party ID, further models fit one of the selected covariates (respondent's race, gender, income percentile, educational attainment, church attendence, ideology, or feeling towards the candidate ), 
+
+
+\section{Vizualizations}
+
+\jp{this part is still pretty rough}
+
+Comparison of these models was not straight forward. Without distributions to compare to, goodness of fit or other such diagnostics are hard to come by. However, there is still a great deal of exploratory analysis which can be performed, particularly via visualiaztion. Incorporation of expert (political science) opinion by way of examination of wordclouds, proportion plots, and exemplar documents can also provide valuable insight with regard to which topics do or do not contain useful and coherent semantic information. These are discussed in turn, followed by figures for a selected number of more interesting topics. Plots for all topics are contained in the Appendix.
+
+\subsection{Simultaneous plotting of multiple covariates}
+
+For a given topic, the prevalence of that topic can vary by any covariate incorporated into the model. In the models fit, topics vary above or below the mean for that topic by year, party ID, and other covariates as they're specified. Interactions between covariates are also allowed.
+
+
+\subsection{Wordclouds}
+To make the wordclouds more informative, two measures were mapped to the displays. Firstly, raw proportions were mapped to the size of the word. However, as noted in Roberts and elsewhere, high frequency words alone may obscure some of what is going on within a given topic if those words also occur frequently in other topics. Thus, their FREX calculation, which also incorporates a weighted measure of topic "exclusivity" is mapped to the saturation of a word, so that words which also occur elsewhere show up darker (in black), and words which are more exclusive to the given topic show up more brightly (in this case, in red).
+
+\subsection{Scree (?) Plots}
+
+Contribution/presence of indiviual words to/in given topics by decreasing prevalence 
+
+\section{Discussion and or conclusions}
+
+
+
+
+\bibliographystyle{asa}
+
+\bibliography{references}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\hh{you'll need to define every symbol and index that you use.}
+
+
 
 
 \centering Topical Content:
@@ -343,161 +225,5 @@ slightly different set up from Roberts, Stewart, Airoldi
 %I think they're basically the same but just slightly different notation. need to match them up
 % http://scholar.princeton.edu/files/bstewart/files/stm.pdf
 
-Matrix of topic pravalence covariates denoted X with dimension D x P and matrix of topical content covariates denoted Y with dimension D x A
-
-\begin{align*}
-	\gamma_k &\sim Normal_P(0, \sigma^2_kI_P) \\
-	\mathbf{\theta_d}&\sim LogisticNormal_{K-1}(\mathbf{\Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
-	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d)\\
-	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n})\\
-	\beta_{d,k,v} &= \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } ) } 
-\end{align*}
 
 
-
-
-In Figure \ref{xkcdFX2}, we can see the third and fourth topics both increase somewhat gradually over time.
-
-\begin{figure}[H]
-<<xkcdFX2, echo=FALSE>>=
-
-plot.estimateEffect(stor, covariate="group", topics = c(3,4), 
-                    model=stmFit, labeltype = "custom", 
-                    xlab="Topic Proportion", main = "Change in topic proportions over time",
-                     xlim= c(0, .3),
-                    custom.labels=c('T3G1',
-                                    'T4G1',
-                                    'T3G2',
-                                    'T4G2',
-                                    'T3G3',
-                                    'T4G3',
-                                    'T3G4',
-                                    'T4G4',
-                                    'T3G5',
-                                    'T4G5',
-                                    'T3G6',
-                                    'T4G6',
-                                    'T3G7',
-                                    'T4G7',
-                                    'T3G8',
-                                    'T4G8',
-                                    'T3G9',
-                                    'T4G9',
-                                    'T3G10',
-                                    'T4G10',
-                                    'T3G11',
-                                    'T4G11'))
-
-@
-\caption{\label{xkcdFX2} estimated topic proportions for each comic "period", Topics 3 and 4}
-\end{figure}
-
-In Figure \ref{xkcdFX3}, we see both topics remaining fairly stable.
-
-\begin{figure}[H]
-
-<<xkcdFX3, echo=FALSE>>=
-
-plot.estimateEffect(stor, covariate="group", topics = c(5,6), 
-                    model=stmFit, labeltype = "custom", 
-                    xlab="Topic Proportion", main = "Change in topic proportions over time",
-                     xlim= c(0, .3),
-                    custom.labels=c('T5G1',
-                                    'T6G1',
-                                    'T5G2',
-                                    'T6G2',
-                                    'T5G3',
-                                    'T6G3',
-                                    'T5G4',
-                                    'T6G4',
-                                    'T5G5',
-                                    'T6G5',
-                                    'T5G6',
-                                    'T6G6',
-                                    'T5G7',
-                                    'T6G7',
-                                    'T5G8',
-                                    'T6G8',
-                                    'T5G9',
-                                    'T6G9',
-                                    'T5G10',
-                                    'T6G10',
-                                    'T5G11',
-                                    'T6G11'))
-
-@
-\caption{\label{xkcdFX3} estimated topic proportions for each comic "period", Topics 5 and 6}
-\end{figure}
-
-In Figure \ref{xkcdFX4}, we see topic 8 increasing slightly while topic 7 decreaseas slightly over time.
-
-
-\begin{figure}[H]
-
-<<xkcdFX4, echo=FALSE>>=
-plot.estimateEffect(stor, covariate="group", topics = c(7,8), 
-                    model=stmFit, labeltype = "custom", 
-                    xlab="Topic Proportion", main = "Change in topic proportions over time",
-                     xlim= c(0, .3),
-                    custom.labels=c('T7G1',
-                                    'T8G1',
-                                    'T7G2',
-                                    'T8G2',
-                                    'T7G3',
-                                    'T8G3',
-                                    'T7G4',
-                                    'T8G4',
-                                    'T7G5',
-                                    'T8G5',
-                                    'T7G6',
-                                    'T8G6',
-                                    'T7G7',
-                                    'T8G7',
-                                    'T7G8',
-                                    'T8G8',
-                                    'T7G9',
-                                    'T8G9',
-                                    'T7G10',
-                                    'T8G10',
-                                    'T7G11',
-                                    'T8G11'))
-
-@
-\caption{\label{xkcdFX4} estimated topic proportions for each comic "period", Topics 7 and 8}
-\end{figure}
-
-In Figure \ref{xkcdFX5}, we see topic 10 remaining fairly stable, while topic 9 increases slightly with eacu subsequent group.
-
-
-\begin{figure}[H]
-<<xkcdFX5, echo=FALSE>>=
-
-plot.estimateEffect(stor, covariate="group", topics = c(9,10), 
-                    model=stmFit, labeltype = "custom", 
-                    xlab="Topic Proportion", main = "Change in topic proportions over time",
-                     xlim= c(0, .3),
-                    custom.labels=c('T9G1',
-                                    'T10G1',
-                                    'T9G2',
-                                    'T10G2',
-                                    'T9G3',
-                                    'T10G3',
-                                    'T9G4',
-                                    'T10G4',
-                                    'T9G5',
-                                    'T10G5',
-                                    'T9G6',
-                                    'T10G6',
-                                    'T9G7',
-                                    'T10G7',
-                                    'T9G8',
-                                    'T10G8',
-                                    'T9G9',
-                                    'T10G9',
-                                    'T9G10',
-                                    'T10G10',
-                                    'T9G11',
-                                    'T10G11'))
-@
-\caption{\label{xkcdFX5} estimated topic proportions for each comic "period", Topics 9 and 10}
-\end{figure}
