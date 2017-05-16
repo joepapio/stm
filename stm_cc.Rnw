@@ -60,7 +60,7 @@ Open ended survey questions provide an opportunity to solicit unguided opinions 
 
 The immediate benefit of such traditional survey formats is that once the data are collected, the analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatively low amounts of personnel power and computational resources. However, by prompting respondents to select from among these predetermined choices, which must be decided upon by researchers prior to implementations, ideas which are already present in the political collective consciousness but not yet salient to researchers may be papered over and thus lost. Considering such information loss, exploration and application of of open ended (and thus ``unprimed") survey responses is an area of great interest in the humanities and social sciences.
 
-\hh{You're sneaking in the intense resource requirements through the backdoor.}
+\hh{You're sneaking in the intense resource requirements through the backdoor. Establish the requirement needs first.}
 However, because of the intense resource requirements needed for such analysis, little work has been done in the way of leveraging these open ended sources, despite a plethora of collected and available data. This is because identification and analysis of the content of these data often requires massive amounts of person-hours, in which trained readers have to go through responses one by one, using their best judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those areas predetermined by researchers and  trained readers.
 
 However, as computing power increases, interest in the development, exploration and application of automated textual analysis methods such as topic models  continues to grow, especially for humanities and social science researchers. Such interest is likely to be stronger with researchers who are required to first build survey instruments before interacting with respondents, as the time required to construct the instruments prior to deployment can introduce significant lag. During such time, nascent ideas forming within the population may be missed or detected by other researchers.
@@ -69,8 +69,8 @@ However, as computing power increases, interest in the development, exploration 
 
 Topic models is a subfield of Machine Learning and Natural Language Processing. They attempt to bring some level of automation, speed, and reliability to quantifying latent thematic information present in the text responses collected through open ended surveys. 
 
-\hh{something went wrong in the next sentence}
-An early example of the efforts to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. \hh{XXX bit more detials: what is the main idea behind pLSI} Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
+\hh{the next sentence is a bit convoluted.}
+An early example of the efforts to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. \hh{what is the main idea behind pLSI in one sentence?} Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
 
 Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan treat each document as a ``bag of words" in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of primary interest in fitting Topic Models. Thus what syntactic information is lost by this bag of words approach can be neglible for our purposes. \hh{what are our purposes?}   
 
@@ -86,7 +86,7 @@ Structural Topic Models (STM) \cite{stm2013} further build on this framework by 
 
 \section{Methodology}
 
-\jp{I'm still need to do a lot with this part, but I wanted to push what I had to the repo so I could get feedback at least on that part.} \hh{:)}
+\jp{I'm still need to do a lot with this part, but I wanted to push what I had to the repo so I could get feedback at least on that part.} \hh{thanks! :)}
 
 
 \subsection{Words, Topics, and Documents}
@@ -143,18 +143,24 @@ Matrix of topic pravalence covariates denoted X with dimension D x P and matrix 
 \section{Application}
 
 \subsection{Data: American National Election Studies}
+\hh{In science papers there's usually a `we' even if it's a single author}
 
-The like/dislike questions of the ANES open ended responses have been collected over many years, but due to the high cost of analysis referenced above, little has been done with these data. I apply the Structural Topic Model method to a subset of these open ended surveys, which were collected during presidential election years, from Ronald Reagan's reelection campaign of 1984 to George W. Bush's reelection campaign of 2004. For each of the two major party candidates, respondents are asked to idenitify what they liked or disliked about that candidate. Although the ANES also collected similar responses on the independent candidate, Ross Perrott, in 1992 and 1996, I have omitted these data from the analysis so the parameters fit for each year are cnosistent. In addition to the open ended survey responses, the ANES also collects basic demographic information on each respondent. As potential prevalence covariates, I explore the year the respones were collected, as well as the respondents' race, gender, political affiliation, church attendence, educational attainment, income percentile, and ideology.
+\hh{XXX slow down: what are the like/dislike questions? }
+The like/dislike questions of the ANES open ended responses have been collected over many years, but due to the high cost of analysis referenced above, little has been done with these data. I apply the Structural Topic Model method to a subset of these open ended surveys, which were collected during presidential election years, from Ronald Reagan's reelection campaign of 1984 to George W. Bush's reelection campaign of 2004. For each of the two major party candidates, respondents are asked to identify what they liked or disliked about that candidate.  Although the ANES also collected similar responses on the independent candidate, Ross Perrott, in 1992 and 1996, I have omitted these data from the analysis so the parameters fit for each year are cnosistent. In addition to the open ended survey responses, the ANES also collects basic demographic information on each respondent. As potential prevalence covariates, I explore the year the responses were collected, as well as the respondents' race, gender, political affiliation, church attendance, educational attainment, income percentile, and ideology.
 
 \subsection{Text Pre-Processing}
 
 \jp{I'll add some examples using a few of the exemplar texts I pulled.}
+\hh{good idea!}
 
+\hh{Rephrase this paragraph into a list - otherwise it is easy to lose the overview, e.g. something like 1. remove punctuation, 2. stem 3. partial 2-gramming (you still need to explain that idea!) 4. stop word removal }
 To prepare the open ended survey respones for analysis, I first applied some basic text preprocessing. Although the STM package includes some functions from the text mining (tm) package, I opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved removing as much punctuation as possible, stemming so that words like "immigrant" and "immigrants" and "immigration" were recognized as a single feature rather than three separate ones, partial 2-gramming so that phrases like "vice president" were treated as a single feature rather than two separate features, removal of a standard list of stop words as well as a few "words" particular to this dataset (like "ae", indicating the interviewer asked "Anything else?"), and removing very low frequency words ( $ n \leq 3 $ instances ) which might slow computation but add nothing to the interpretability of the model. 
 
-After this preprocessing of the coprus, the remaining dataset contains 23,522 instances of open ended responses with counts for 3,357 features (one-grams and selected two-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
+After this preprocessing of the corpus, the remaining dataset contains 23,522 instances of open ended responses with counts for 3,357 features (one-grams and selected two-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
 
-This process yeilds a document feature matrix, denoted $ \mathcal{X} $, in which the \textit{d}-th row corresponds to the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+\hh{XXX instead of textit use mathematical notation with \$ }
+
+This process yields a document feature matrix, denoted $ \mathcal{X} $, in which the \textit{d}-th row corresponds to the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. This matrix is very sparse, with the vast majority of entries being zeros.
 
 \subsection{Model}
 
@@ -183,9 +189,11 @@ To make the wordclouds more informative, two measures were mapped to the display
 
 \subsection{Scree (?) Plots}
 
+\hh{yep, it's scree plot. Usually scree plots are associated with investigating the influence of factors in a PCA. }
+
 Contribution/presence of indiviual words to/in given topics by decreasing prevalence 
 
-\section{Discussion and or conclusions}
+\section{Discussion and conclusions}
 
 
 
