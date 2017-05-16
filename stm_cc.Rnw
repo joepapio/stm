@@ -79,17 +79,20 @@ Structural Topic Models (STM) \cite{stm2013} further builds on this framework by
 \citet{stm2013} apply their method of Structural Topic Modeling to open ended survey data from the American National Election Studies (ANES) collected in 2008 in which respondents were asked to identify the most important and second most important political problems facing the United States and personal issues in the election. 
 
 
-\subsection{Words, Topics, and Documents}
 
-We consider each response as a document, which we define as the \textit{d}-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all words or features present within the corpus. 
-
-Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Topics are the latent units of meaning from which each document is generated. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather occur in multiple topics with varying prevalence. Once the set of topics is computed, then the proportion of each topic within each document can be estimated.
 
 
 
 \section{The Mathy Stuff}
 
 \jp{I'm still need to do a lot with this part, but I wanted to push what I had to the repo so I could get feedback at least on that part.}
+
+
+\subsection{Words, Topics, and Documents}
+
+We consider each response as a document, which we define as the \textit{d}-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all words or features present within the corpus. 
+
+Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Topics are the latent units of meaning from which each document is generated. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather occur in multiple topics with varying prevalence. Once the set of topics is computed, then the proportion of each topic within each document can be estimated.
 
 \begin{centering} 
 Topic Prevalence:
