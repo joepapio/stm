@@ -18,7 +18,7 @@
 
 <<concordance, echo=FALSE, warning=FALSE, message=FALSE>>=
 opts_knit$set(self.contained=FALSE, cache=TRUE, width=40)
-
+library(tidyverse)
 library(tm)
 library(quanteda)
 library(RColorBrewer)
@@ -27,9 +27,7 @@ library(stringi)
 library(Rtsne)
 library(geometry)
 library(stmBrowser)
-library(dplyr)
-library(tidytext )
-library(reshape)
+
 
 library(lda)
 
@@ -40,7 +38,6 @@ library(lda)
 
 #set.seed(1332)
 
-dfTranscripts <- read.table("transcriptsB.csv",header=F,sep="\t",colClasses=c("character","character"), col.names=c("url","text"),quote="")
 
 str_break = function(x, width = 70L) {
   n = nchar(x)
@@ -50,6 +47,20 @@ str_break = function(x, width = 70L) {
   if (n %% width != 0) n2 = c(n2, n)
   substring(x, n1, n2)
 }
+
+example1 <-"He has turned his back on the coal and steel industry in favor of importing from foreign countries.  He has West Virginia, Ohio, and Pennsylvania on its knees."
+
+example2 <- dfm(example1, stem=TRUE, removeNumbers=TRUE, 
+                 removePunct=TRUE, removeSeparators=TRUE,
+                 ignoredFeatures=c(stopwords("english"), 
+                                   "na", "ao", "wm", "tm", "ae", "ge"))
+
+example3 <- "I think my husband's disability and our social security is in danger.  He will cut this and the disability is my husband's only income.  He has already cut some out of our check."
+
+example4 <- dfm(gsub("social security", "socialsecurity", example3), stem=TRUE, 
+                removeNumbers=TRUE, removePunct=TRUE, removeSeparators=TRUE, 
+                ignoredFeatures=c(stopwords("english"), 
+                                   "na", "ao", "wm", "tm", "ae", "ge"))
 @
 
 \section{Introduction, Motivation, and Literature Review}
@@ -58,30 +69,25 @@ str_break = function(x, width = 70L) {
  
 Open ended survey questions provide an opportunity to solicit unguided opinions and ideas from participants, avoiding possible biases that can be introduced when utilizing more traditional survey forms in which respondents are prompted to select their answer from one of several predetermined options in a closed set of choices. 
 
-The immediate benefit of such traditional survey formats is that once the data are collected, the analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatively low amounts of personnel power and computational resources. However, by prompting respondents to select from among these predetermined choices, which must be decided upon by researchers prior to implementations, ideas which are already present in the political collective consciousness but not yet salient to researchers may be papered over and thus lost. Considering such information loss, exploration and application of of open ended (and thus ``unprimed") survey responses is an area of great interest in the humanities and social sciences.
+The immediate benefit of such traditional survey formats is that once the data are collected, the analysis, including estimation of the prevalence of those opinions within the population, is fairly straight forward, and generally requires only relatively low amounts of personnel power and computational resources. However, by prompting respondents to select from among these predetermined choices, which must be decided upon by researchers prior to implementations, ideas which are already present in the political collective consciousness but not yet salient to researchers may be papered over and thus lost. Considering such information loss, exploration and application of of open ended (and thus "unprimed") survey responses is an area of great interest in the humanities and social sciences.
 
-\hh{You're sneaking in the intense resource requirements through the backdoor. Establish the requirement needs first.}
-However, because of the intense resource requirements needed for such analysis, little work has been done in the way of leveraging these open ended sources, despite a plethora of collected and available data. This is because identification and analysis of the content of these data often requires massive amounts of person-hours, in which trained readers have to go through responses one by one, using their best judgement to identify the presence or absence of one or more topical areas from a predetermined list. Thus, in addition to the large resource requirements, some topical information contained in the responses might still be lost when utilizing this method of analysis if that topical information didn’t fit neatly into one of those areas predetermined by researchers and  trained readers.
+Unlike analysis of more traditionally formatted surveys, open ended surveys can be much more resource intensive to analyze. Prior to analysis, the data often require large amounts of in person processing to read and code the responses. Readers must be trained before they can perform the task of reading through indiviudal responses and then use their judgement to decide what topic or topics each open ended response is about, often selecting those topics from options generated by the researchers. Thus, in addition to the large resource requirements, some topical information contained in the responses may still go still go unrecognized when utilizing this method of analyzing open ended surveys if that topical information didn’t fit neatly into any of the options predetermined by researchers or readers.
 
 However, as computing power increases, interest in the development, exploration and application of automated textual analysis methods such as topic models  continues to grow, especially for humanities and social science researchers. Such interest is likely to be stronger with researchers who are required to first build survey instruments before interacting with respondents, as the time required to construct the instruments prior to deployment can introduce significant lag. During such time, nascent ideas forming within the population may be missed or detected by other researchers.
 
 \subsection{pLSI, LDA, and STM}
 
-Topic models is a subfield of Machine Learning and Natural Language Processing. They attempt to bring some level of automation, speed, and reliability to quantifying latent thematic information present in the text responses collected through open ended surveys. 
+Topic models are a subfield of Machine Learning and Natural Language Processing. Collectively they represent an effort to bring some level of automation, speed, and reliability to quantifying the latent thematic information present in text responses. Such efforts can be applied to texts of varying sizes, including the open ended sureys.
 
-\hh{the next sentence is a bit convoluted.}
-An early example of the efforts to apply statistically sound methods to resonably model the latent processes that could have generated the documents in a corpus is Probabalistic Latent Semantic Indexing (pLSI) \citep{hofmann:1999}. \hh{what is the main idea behind pLSI in one sentence?} Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
+Probabalistic Latent Semantic Indexing (pLSI) was one of the earliest forms of topic modeling to be proposed  \citep{hofmann:1999}. pLSI is derived from latent class modeling for factor analysis of count data. It relies on associating latent class variables, ie topics, with how observed data co-occur. Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
 
-Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan treat each document as a ``bag of words" in which the order of the words is not taken into account. Although this causes some loss of syntactic information, the semantic content of the documents is what is of primary interest in fitting Topic Models. Thus what syntactic information is lost by this bag of words approach can be neglible for our purposes. \hh{what are our purposes?}   
+Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan treat each document as a "bag of words" in which the order of the words is not taken into account. Although this causes some loss of syntactic information, this is not a major concern since the primary focus is on ascertaining the semantic and thematic content of the set of documents in question. 
 
 Blei further builds on LDA, addressing the somewhat unrealistic expectation in large collections of documents that there is no correlation among topics or documents, with the introduction of Correlated Topic models \citep{Blei:2007jy}. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. Thus, correlated topic models build on LDA by relaxing the independence assumption.
 
-Structural Topic Models (STM) \cite{stm2013} further build on this framework by allowing for the inclusion of document level covariates. In the open ended surveys analyzed here, these covariates include demographic information about the respondent, such as their race, gender, age, and/or party affiliation. \hh{why the and/or?}
+Structural Topic Models (STM) \cite{stm2013} further build on this framework by allowing for the inclusion of document level covariates. In the open ended surveys analyzed here, these covariates include demographic information about the respondent, such as their race, gender, age, and party affiliation.
 
 \citet{stm2013} apply their method of Structural Topic Modeling to open ended survey data from the American National Election Studies (ANES) collected in 2008 in which respondents were asked to identify the two most important political problems facing the United States and personal issues in the election. 
-
-
-%\hh{Define and explain 'other' features, such as k-grams.}
 
 
 \section{Methodology}
@@ -91,7 +97,7 @@ Structural Topic Models (STM) \cite{stm2013} further build on this framework by 
 
 \subsection{Words, Topics, and Documents}
 
-We consider each response as a document, which we define as the $d$-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all words or features present within the corpus. 
+Within the framework of topic models generally, and the Strucural Topic Model specifically, we consider each response as a document, which we define as the $d$-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all words or features present within the corpus. 
 
 Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Topics are the latent units of meaning from which each document is generated. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather occur in multiple topics with varying prevalence. Once the set of topics is computed, then the proportion of each topic within each document can be estimated.
 
@@ -143,24 +149,60 @@ Matrix of topic pravalence covariates denoted X with dimension D x P and matrix 
 \section{Application}
 
 \subsection{Data: American National Election Studies}
-\hh{In science papers there's usually a `we' even if it's a single author}
 
-\hh{XXX slow down: what are the like/dislike questions? }
-The like/dislike questions of the ANES open ended responses have been collected over many years, but due to the high cost of analysis referenced above, little has been done with these data. I apply the Structural Topic Model method to a subset of these open ended surveys, which were collected during presidential election years, from Ronald Reagan's reelection campaign of 1984 to George W. Bush's reelection campaign of 2004. For each of the two major party candidates, respondents are asked to identify what they liked or disliked about that candidate.  Although the ANES also collected similar responses on the independent candidate, Ross Perrott, in 1992 and 1996, I have omitted these data from the analysis so the parameters fit for each year are cnosistent. In addition to the open ended survey responses, the ANES also collects basic demographic information on each respondent. As potential prevalence covariates, I explore the year the responses were collected, as well as the respondents' race, gender, political affiliation, church attendance, educational attainment, income percentile, and ideology.
+The American National Election Studies has been collecting survey data on elections in the United States since 1948. In addition to numerous traditional survey forms, they have also continuously asked several questions which elicit open ended responses from participants. These include the "like/dislike" questions, which have been collected both on each of the two major US political parties (and their congressional candidates) during most presidential and midterm elections as well as for the parties' presidential candidates during presidential election years.  For this analysis, we focus on the "like/dislike" responces specifically for presidential candidates, which read as follows:
+
+\begin{quote}
+Now I'd like to ask you about the good and bad points of the two candidates for President. Is there anything in particular about [Democratic presidential candidate]/[Republican presidential candidate] that might make you want to vote \textit{for} him?  What is that? Anything else?
+\end{quote}
+
+\begin{quote}
+Is there anything in particular about [Democratic presidential candidate]/[Republican presidential candidate] that might make you want to vote \textit{against} him? What is that?  Anything else?
+\end{quote}
+
+While the ANES has collected open ended responses to these questions over many years, little has been done with them due to the high cost of analysis referenced above. We apply the Structural Topic Model to a subset of these open ended surveys, collected during presidential election years, from Ronald Reagan's reelection campaign of 1984 to George W. Bush's reelection campaign of 2004. Although the ANES also collected similar responses on the independent candidate, Ross Perrott, in 1992 and 1996, we have omitted these data from the analysis to be consistent across all six years. In addition to the open ended survey responses, the ANES also collects basic demographic information on each respondent. As potential prevalence covariates, we explore the year the responses were collected, as well as the respondents' race, gender, political affiliation, church attendance, educational attainment, income percentile, and ideology.
 
 \subsection{Text Pre-Processing}
 
-\jp{I'll add some examples using a few of the exemplar texts I pulled.}
-\hh{good idea!}
 
-\hh{Rephrase this paragraph into a list - otherwise it is easy to lose the overview, e.g. something like 1. remove punctuation, 2. stem 3. partial 2-gramming (you still need to explain that idea!) 4. stop word removal }
-To prepare the open ended survey respones for analysis, I first applied some basic text preprocessing. Although the STM package includes some functions from the text mining (tm) package, I opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved removing as much punctuation as possible, stemming so that words like "immigrant" and "immigrants" and "immigration" were recognized as a single feature rather than three separate ones, partial 2-gramming so that phrases like "vice president" were treated as a single feature rather than two separate features, removal of a standard list of stop words as well as a few "words" particular to this dataset (like "ae", indicating the interviewer asked "Anything else?"), and removing very low frequency words ( $ n \leq 3 $ instances ) which might slow computation but add nothing to the interpretability of the model. 
+To prepare the open ended survey respones for analysis, we first applied some basic text preprocessing. Although the STM package includes some functions from the text mining (tm) package, we opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved several steps:
+\begin{enumerate}
+\item remove punctruation
+\item stemming
+\item partial 2-grammming
+\item stop word removal (ie, removal of generally very high frequency features)
+\item very low frequency feature removal
+\end{enumerate}
 
-After this preprocessing of the corpus, the remaining dataset contains 23,522 instances of open ended responses with counts for 3,357 features (one-grams and selected two-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
+Stemming ensures that words like "immigrant" and "immigrants" and "immigration" are recognized as a single feature within the corpus, rather than three separate features. "Partial 2-gramming" retains most features in the vocabulary as single words (ie 1-grams), but belnds certain phrases of two word length into single features, so that, for example, "vice president" or "social security" are recognized as single features, rather than two separate features, and thus are "seen" by our model as a different features than "president" or "security" respectively. We opted for "partial 2-gramming" rather than using 2-grams of the entire corpus, since models using just 1-grams or all 1- and 2-grams generated fairly similar models, but the models using combined 1- and 2-grams took significantly longer amounts of time to run. Stop word removal involves filtering out a standard set of "function" words, including most articles and prepositions, as well as some corpus specific features, like "ae" which indicates that the interviewer asked "Anything else?" Lastly, very low frequency words ( $ n \leq 3 $ instances ) which might slow computation but add nothing to the interpretability of the model are also removed. 
 
-\hh{XXX instead of textit use mathematical notation with \$ }
+Example 1: Original text
+<<ex1orig, eval=TRUE, echo=FALSE>>=
+print(str_break(example1))
+@
 
-This process yields a document feature matrix, denoted $ \mathcal{X} $, in which the \textit{d}-th row corresponds to the \textit{d}-th document, and the \textit{w}-th column represents the \textit{w}-th n-gram in the vocabulary. Then the \textit{d,w}-th entry in the matrix is the number of times the \textit{w}-th n-gram occurs in the \textit{d}-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+
+Example 1: Preprocessed text
+<<ex1prepro, eval=TRUE, echo=FALSE>>=
+rbind(example2@Dimnames$features, example2@x)
+@
+
+
+Example 2: Original text
+<<ex2orig, eval=TRUE, echo=FALSE>>=
+print(str_break(example3))
+@
+
+Example 2: Preprocessed text
+<<ex2prepro, eval=TRUE, echo=FALSE>>=
+rbind(example4@Dimnames$features, example4@x)
+@
+
+After this preprocessing of the corpus, the remaining dataset contains 23,507 instances of open ended responses with counts for 3,357 features (1-grams and selected 2-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
+
+
+
+This process yields a document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document, and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix is the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
 
 \subsection{Model}
 
@@ -187,7 +229,7 @@ For a given topic, the prevalence of that topic can vary by any covariate incorp
 \subsection{Wordclouds}
 To make the wordclouds more informative, two measures were mapped to the displays. Firstly, raw proportions were mapped to the size of the word. However, as noted in Roberts and elsewhere, high frequency words alone may obscure some of what is going on within a given topic if those words also occur frequently in other topics. Thus, their FREX calculation, which also incorporates a weighted measure of topic "exclusivity" is mapped to the saturation of a word, so that words which also occur elsewhere show up darker (in black), and words which are more exclusive to the given topic show up more brightly (in this case, in red).
 
-\subsection{Scree (?) Plots}
+\subsection{Scree Plots}
 
 \hh{yep, it's scree plot. Usually scree plots are associated with investigating the influence of factors in a PCA. }
 
