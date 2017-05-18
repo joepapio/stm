@@ -19,24 +19,10 @@
 <<concordance, echo=FALSE, warning=FALSE, message=FALSE>>=
 opts_knit$set(self.contained=FALSE, cache=TRUE, width=40)
 library(tidyverse)
-library(tm)
 library(quanteda)
 library(RColorBrewer)
 library(stm)
-library(stringi)
-library(Rtsne)
-library(geometry)
-library(stmBrowser)
 
-
-library(lda)
-
-#library(topicmodels)
-#library(Matrix)
-
-#library(textir)
-
-#set.seed(1332)
 
 
 str_break = function(x, width = 70L) {
@@ -200,26 +186,29 @@ rbind(example4@Dimnames$features, example4@x)
 
 After this preprocessing of the corpus, the remaining dataset contains 23,507 instances of open ended responses with counts for 3,357 features (1-grams and selected 2-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
 
-
-
-This process yields a document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document, and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix is the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+After this process, the corpus is then represented by a document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix represents the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
 
 \subsection{Model}
 
-After fitting models with various numbers of topics, I settled on models using $K=60$ topics. This is close to the number of topics ($K=69$) which Roberts et al (cite) fit for their analysis of a open ended survey data from 2008, for which they were able to obtain and compare hand coded analysis.
+After fitting models with various numbers of topics, I settled on models using $K=60$ topics. This is close to the number of topics ($K=69$) which Roberts et al (cite) fit for their analysis of a open ended survey data from 2008 inquiring about the top issues of the campaign, for which they were able to obtain and compare hand coded analysis.
 
-As a baseline model, I fit just the election year as a covariate. Rather than fitting this as a linear coefficient, I opted for a categorical variable to avoid forcing the prevalence of a given topic to either strictly increase or strictly decrease over time.
+As a baseline model, I fit just the election year as a covariate. Rather than fitting this as a linear coefficient, I opted for a categorical variable to avoid forcing the prevalence of a given topic to either strictly increase or strictly decrease over time. This model reduces similarly to the correlated topic model presented in \citet{Blei:2007jy}
 
 A second baseline model incorporated the party identification of the respondent, as well as interactions between this covariate and the year. 
 
 In addition to the year and respondent's party ID, further models fit one of the selected covariates (respondent's race, gender, income percentile, educational attainment, church attendence, ideology, or feeling towards the candidate ), 
 
+While our intention had been to examine how topics and topic proportions differ when models with different covariates are fit, none of the models fit appear to be particularly different.
+
+Comparison of word clouds and scree plots suggest only very minor differeces both in overall word proportions and FREX calculations. None of the 10 models fit display enough of a difference to visually justify that they are particularly different from one another. These differences (or overall lack thereof, are discussed in the following section).
 
 \section{Vizualizations}
 
 \jp{this part is still pretty rough}
 
-Comparison of these models was not straight forward. Without distributions to compare to, goodness of fit or other such diagnostics are hard to come by. However, there is still a great deal of exploratory analysis which can be performed, particularly via visualiaztion. Incorporation of expert (political science) opinion by way of examination of wordclouds, proportion plots, and exemplar documents can also provide valuable insight with regard to which topics do or do not contain useful and coherent semantic information. These are discussed in turn, followed by figures for a selected number of more interesting topics. Plots for all topics are contained in the Appendix.
+Comparison of these models was not straight forward. Without some knowledge of distributions to compare to, goodness of fit or other such diagnostics are hard to come by. However, there is still a great deal of exploratory analysis which can be performed, particularly via visualiaztion. Incorporation of expert (political science) opinion by way of examination of wordclouds, proportion plots, and exemplar documents can also provide valuable insight with regard to which topics do or do not contain useful and coherent semantic information. These are discussed in turn, accompanied by figures for a selected number of more interesting topics. Plots for all topics are contained in the Appendix.
+
+At this point, there isn't enough variation from one model to the next to say with any certainty that our identified covariates have any identifiable effects on the estimated topics, how much those topics show up within a given document, or for a given group of respondents.
 
 \subsection{Simultaneous plotting of multiple covariates}
 
