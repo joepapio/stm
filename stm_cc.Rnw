@@ -67,18 +67,18 @@ Topic models are a subfield of Machine Learning and Natural Language Processing.
 
 Probabalistic Latent Semantic Indexing (pLSI) was one of the earliest forms of topic modeling to be proposed  \citep{hofmann:1999}. pLSI is derived from latent class modeling for factor analysis of count data. It relies on associating latent class variables, ie topics, with how observed data co-occur. Despite many limitations, pLSI was a pioneering step in the development of the foundation for the Topic Models framework.
 
-Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan treat each document as a "bag of words" in which the order of the words is not taken into account. Although this causes some loss of syntactic information, this is not a major concern since the primary focus is on ascertaining the semantic and thematic content of the set of documents in question. 
+Latent Dirichlet Allocation (LDA) \cite{LDA2003} built on the work of pLSI, allowing for the assignment of probability beyond the documents included when the model was fit to documents not originally included. Blei, Ng and Jordan assume both documents within the corpus and words within the document are exchangable, which is to say the order does not matter, and any word/document can come before or after any other word/document. This treatment of words within a document is referred to as the "bag of words" approach.  Although this approach with respect to the words within a document causes some loss of syntactic information, this is not a major concern since the primary focus is on ascertaining the semantic and thematic content of the set of documents in question. 
 
 Blei further builds on LDA, addressing the somewhat unrealistic expectation in large collections of documents that there is no correlation among topics or documents, with the introduction of Correlated Topic models \citep{Blei:2007jy}. For example, within the peer reviewed literature of a given field, we expect that articles written at a later date will be influenced to some degree by articles that were published previously. Thus, correlated topic models build on LDA by relaxing the independence assumption.
 
-Structural Topic Models (STM) \cite{stm2013} further build on this framework by allowing for the inclusion of document level covariates. In the open ended surveys analyzed here, these covariates include demographic information about the respondent, such as their race, gender, age, and party affiliation.
+Further developments in topic modeling include the Dirichlet-multinomial Regression model to allow covariates to affect topic prevalance \citep{TMCAFDMR} and change the rate at whihch a topic appears in a given document  and allowing topic content to vary in log-frequency from a the background/mean \citep{SAGM}, thus allowing respondents to discuss a given topic at the same rate but in different ways (ie using different words).
+
+Taking these developments and combining them, Structural Topic Models (STM) \cite{stm2013} offer a general framework to allowing for the inclusion of document level covariates which can influence both the rate at whicha topic appears in a document \textit{and} what words are more or less likely to be used when a given topic is discussed by different groups. In the open ended surveys analyzed here, the covariates explored include the year of the election, demographic information about the respondent (race, gender, income, education, ideology, church attendence and party affiliation), the candidate's political party, and whether the thing the respondent mentions in their response is likely to make them vote \textit{for} (like) or \textit{against} (dislike) that candidate.
 
 \citet{stm2013} apply their method of Structural Topic Modeling to open ended survey data from the American National Election Studies (ANES) collected in 2008 in which respondents were asked to identify the two most important political problems facing the United States and personal issues in the election. 
 
 
 \section{Methodology}
-
-\jp{I'm still need to do a lot with this part, but I wanted to push what I had to the repo so I could get feedback at least on that part.} \hh{thanks! :)}
 
 
 \subsection{Words, Topics, and Documents}
@@ -87,28 +87,32 @@ Within the framework of topic models generally, and the Strucural Topic Model sp
 
 Topics, then, exist within the corpus, as groups of words which have high co-occurrence within documents. Topics are the latent units of meaning from which each document is generated. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather occur in multiple topics with varying prevalence. Once the set of topics is computed, then the proportion of each topic within each document can be estimated.
 
-\begin{centering} 
-Topic Prevalence:
-\begin{align*}
-	\mu_{d,k} &= X_d\gamma_k \\
-	\gamma_k &\sim \mathcal{N}(0,\sigma_k^2)\\
-	\sigma_k^2 &\sim Gamma(s^{\gamma}, r^{\gamma})
-\end{align*}
+Get around exchangability issue by giving groups of documents within a covariate their own prior. 
+The inclusion of document level covariates means that documents are no longer exchangable, since a document from level $a$ of covariate A cannot be exchanged with a document from level $a+1$ of the same covariate. However, this issue is addressed by moving from a global Dirichlet prior specifed for all documents (as in LDA) to the use of a Logistic Normal prior with a mean which varies by covariate levels.
 
-$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
+\subsection{General Model Specification}
 
-$\gamma_k$ is the prior for the kth topic mean
+The Structural Topic Model is essentially broken into three parts, the Core Language Model, which builds off the Correlated Topic Model \citep{Blei:2007jy}, the Topic Prevalence Model, developed in \citep{TMCAFDMR}, and the Topical Content Model, developed in \citep{SAGM}.
 
-$\sigma^2_k$ is the prior for the kth topic variance
+\citet{stm2016}
 
-Language Model:
-\begin{align*}
-\theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
-z_{d,n} &\sim Mult(\theta_d)\\
-w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
-\end{align*}
+For a document $d$, given a selected number of topics $K$, observed words $\{w_{d,n}\}$ a design matrix of topic pravalence covariates denoted $\mathbf{X}$ and another design matrix of topical content covariates denoted $\mathbf{Y}$
 
+\begin{centering}
+
+\begin{align}
+	\gamma_{k} &\sim Normal_P(0, \sigma^2_kI_P), for k=1...K-1 \\
+	\sigma^2_k &\sim Inverse-Gamma( )\\
+	\mathbf{\theta_d} &\sim LogisticNormal_{K-1}(\mathbf{\mu_d = \Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
+	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d) for n=1...N_d\\
+	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n}  for n = 1...N_d)\\
+	\beta_{d,k,v} & = \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c)}_{y_d,v} \kappa^{(i)}_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c)}_{y_d,v } \kappa^{(i)}_{y_d,k,v} ) } for v=1...V and k=1...K
+\end{align}
 \end{centering}
+
+
+
+
 
 $\theta_d$ is the vector of topic proportions, and the prior for $z_{d,n}$
 
@@ -117,20 +121,10 @@ $z_{d,n} $ is latent variable for the nth word in the d-th document? (and the pr
 $w_{d,n}$ is the observed occurance of the nth word in the d-th document
 
 
-Matrix of topic pravalence covariates denoted X with dimension D x P and matrix of topical content covariates denoted Y with dimension D x A
 
 
-\begin{centering}
 
-\begin{align*}
-	\gamma_k &\sim Normal_P(0, \sigma^2_kI_P) \\
-	\mathbf{\theta_d}&\sim LogisticNormal_{K-1}(\mathbf{\Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
-	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d)\\
-	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n})\\
-	\beta_{d,k,v} &= \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c) }_{y_d,v } \kappa^{(i) }_{y_d,k,v } ) } 
-\end{align*}
 
-\end{centering}
 
 \section{Application}
 
@@ -160,19 +154,19 @@ To prepare the open ended survey respones for analysis, we first applied some ba
 \item very low frequency feature removal
 \end{enumerate}
 
-Stemming ensures that words like "immigrant" and "immigrants" and "immigration" are recognized as a single feature within the corpus, rather than three separate features. "Partial 2-gramming" retains most features in the vocabulary as single words (ie 1-grams), but belnds certain phrases of two word length into single features, so that, for example, "vice president" or "social security" are recognized as single features, rather than two separate features, and thus are "seen" by our model as a different features than "president" or "security" respectively. We opted for "partial 2-gramming" rather than using 2-grams of the entire corpus, since models using just 1-grams or all 1- and 2-grams generated fairly similar models, but the models using combined 1- and 2-grams took significantly longer amounts of time to run. Stop word removal involves filtering out a standard set of "function" words, including most articles and prepositions, as well as some corpus specific features, like "ae" which indicates that the interviewer asked "Anything else?" Lastly, very low frequency words ( $ n \leq 3 $ instances ) which might slow computation but add nothing to the interpretability of the model are also removed. 
+Stemming ensures that words like "immigrant" and "immigrants" and "immigration" are recognized as a single feature within the corpus, rather than three separate features. "Partial 2-gramming" retains most features in the vocabulary as single words (ie 1-grams), but belnds certain phrases of two word length into single features, so that, for example, "vice president" or "social security" are recognized as single features, rather than two separate features, and thus are "seen" by our model as a different features than "president" or "security" respectively. We opted for "partial 2-gramming" rather than using 2-grams of the entire corpus, since models using just 1-grams or all 1- and 2-grams generated fairly similar models, but topic estimation for models using all possible 1- and 2-grams took significantly longer amounts of time to run. Stop word removal involves filtering out a standard set of English "function" words, including most articles and prepositions, as well as some corpus specific features, like "ae" which indicates that the interviewer asked "Anything else?" Lastly, very low frequency words ($n \leq 3$ instances) which might slow computation but add nothing to the interpretability of the model are also removed. 
+
+Two example responses are given below, showing first the unprocessed response followed by a "toy" document feature matrix representing a corpus of only that individual document. Document feature matrices representing corpora with more than one document will almost always have some entries which are zero, since two documents will rarely have exactly the same set of words represented. 
 
 Example 1: Original text
 <<ex1orig, eval=TRUE, echo=FALSE>>=
 print(str_break(example1))
 @
 
-
 Example 1: Preprocessed text
 <<ex1prepro, eval=TRUE, echo=FALSE>>=
 rbind(example2@Dimnames$features, example2@x)
 @
-
 
 Example 2: Original text
 <<ex2orig, eval=TRUE, echo=FALSE>>=
@@ -186,7 +180,7 @@ rbind(example4@Dimnames$features, example4@x)
 
 After this preprocessing of the corpus, the remaining dataset contains 23,507 instances of open ended responses with counts for 3,357 features (1-grams and selected 2-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
 
-After this process, the corpus is then represented by a document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix represents the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+After this process, the corpus is then represented by a 23,507 rows by 3,357 column document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix represents the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
 
 \subsection{Model}
 
@@ -204,7 +198,7 @@ Comparison of word clouds and scree plots suggest only very minor differeces bot
 
 \section{Vizualizations}
 
-\jp{this part is still pretty rough}
+\jp{more cleaning needed, plus need to pick some plots}
 
 Comparison of these models was not straight forward. Without some knowledge of distributions to compare to, goodness of fit or other such diagnostics are hard to come by. However, there is still a great deal of exploratory analysis which can be performed, particularly via visualiaztion. Incorporation of expert (political science) opinion by way of examination of wordclouds, proportion plots, and exemplar documents can also provide valuable insight with regard to which topics do or do not contain useful and coherent semantic information. These are discussed in turn, accompanied by figures for a selected number of more interesting topics. Plots for all topics are contained in the Appendix.
 
@@ -215,16 +209,39 @@ At this point, there isn't enough variation from one model to the next to say wi
 For a given topic, the prevalence of that topic can vary by any covariate incorporated into the model. In the models fit, topics vary above or below the mean for that topic by year, party ID, and other covariates as they're specified. Interactions between covariates are also allowed.
 
 
+###add some plots from partyQ model, some like/dislike, maybe one or two from race or gender?
+
 \subsection{Wordclouds}
 To make the wordclouds more informative, two measures were mapped to the displays. Firstly, raw proportions were mapped to the size of the word. However, as noted in Roberts and elsewhere, high frequency words alone may obscure some of what is going on within a given topic if those words also occur frequently in other topics. Thus, their FREX calculation, which also incorporates a weighted measure of topic "exclusivity" is mapped to the saturation of a word, so that words which also occur elsewhere show up darker (in black), and words which are more exclusive to the given topic show up more brightly (in this case, in red).
 
-\subsection{Scree Plots}
+###plotting of content covariate by color allows indication of words used more for(purple)/againast(green) and when describing the dem(blue)/rep(red) candidate
 
-\hh{yep, it's scree plot. Usually scree plots are associated with investigating the influence of factors in a PCA. }
+##a few sets of three wordclouds - basic/frex, dem vs rep candidate, and like vs dislike
+
+\subsection{Scree Plots}
 
 Contribution/presence of indiviual words to/in given topics by decreasing prevalence 
 
+###top 40 words for each topic, where height indicates how much the word shows up (unnormalized) and red hue indicates FREX calc - need to add formula for FREX calc
+
 \section{Discussion and conclusions}
+
+The flexibility of STM is both a blessing and a curse. Even with a deeper knowledge of stats, examining/understanding/interpreting models is not entirely straight forward. If the goal is to make available for social sciences, humanities, many may lack the background to apply the model in a reliable way, particularly if it has any complexity.
+
+need more in the way of model fit stats, or some kind of nested model comparison?
+
+application to larger texts
+
+more guidance on how selecting K impacts the models - some way to meausure if there's too many or two few topics for a corpus - ie too many "garbage" topics
+
+ways to compare between various K sized models
+
+seems odd that adding covariates didn't really change the topic estimation if topic estimation happens at same time as param estimation - maybe too many covariates or levels of corvatiates?
+
+cleaner/more efficient way to reparameterize?
+
+my functions to fill in some of the gaps in the STM package's functions, better and more varied plotting, tidying param values to facilitate plotting
+
 
 
 
@@ -237,21 +254,32 @@ Contribution/presence of indiviual words to/in given topics by decreasing preval
 \end{document}
 
 
-
-
-
-
-
-
-
-
-
-
-
 \hh{you'll need to define every symbol and index that you use.}
 
+$\beta_{d,v}^k$ is the sum of the covariate effects?, and a prior for $w_{d,n}$
 
+\begin{centering} 
+Topic Prevalence:
+\begin{align*}
+	\mu_{d,k} &= X_d\gamma_k \\
+	\gamma_k &\sim \mathcal{N}(0,\sigma_k^2)\\
+	\sigma_k^2 &\sim Gamma(s^{\gamma}, r^{\gamma})
+\end{align*}
 
+$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
+
+$\gamma_k$ is the prior for the kth topic mean
+
+$\sigma^2_k$ is the prior for the kth topic variance
+
+Language Model:
+\begin{align*}
+\theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
+z_{d,n} &\sim Mult(\theta_d)\\
+w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
+\end{align*}
+
+\end{centering}
 
 \centering Topical Content:
 \begin{align*}
@@ -259,14 +287,3 @@ Contribution/presence of indiviual words to/in given topics by decreasing preval
 \kappa_v^{y,k} &\sim Laplace(0,\tau_v^{y,k})\\
 \tau_v^{y,k} &\sim Gamma(s^{\kappa}, r^{\kappa})
 \end{align*}
-
-
-$\beta_{d,v}^k$ is the sum of the covariate effects?, and a prior for $w_{d,n}$
-
-
-slightly different set up from Roberts, Stewart, Airoldi 
-%I think they're basically the same but just slightly different notation. need to match them up
-% http://scholar.princeton.edu/files/bstewart/files/stm.pdf
-
-
-
