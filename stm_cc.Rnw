@@ -253,6 +253,10 @@ Comparison of these models was not straight forward. Without some knowledge of d
 
 At this point, there isn't enough variation from one model to the next to say with any certainty that our identified covariates have any identifiable effects on the estimated topics, how much those topics show up within a given document, or for a given group of respondents.
 
+Perhaps the most fun and also the most frustrating part of this project was considering ways to summarize the information gleaned from fitting the various models. While it is our hope that as scholars continue to use and explore these procedures, more easily assessible metrics of fit will be developed, we focus mostly on graphical examiniations.
+
+Most of the plotting done throughout this papwer leverages the amazing power and flexiblity of ggplot and other packages within tidyverse to make plots more dynamic and informative, something which is much harder to do efficiently when relying on the base R plotting functionality, as is the case with the STM package.
+
 \subsection{Simultaneous plotting of multiple covariates}
 
 For a given topic, the prevalence of that topic can vary by any covariate incorporated into the model. In the models fit, topics vary above or below the mean for that topic by year, party ID, and other covariates as they're specified. Interactions between covariates are also allowed.
@@ -277,9 +281,7 @@ Additional wordclouds are created to inspect the ways in which one of two conten
 
 Here again, we map the proportion with which a word shows up in a given topic to the size of the term in the plot. But for a given term, now we map how much the term's frequency, conditioned on selected topic, content covariate level, and their interactions, deviates from the prevalance of that term across the corpus to a three color gradient, with gray being the central color. Terms that are not particularly biased "towards" either level of the content covariate are mapped towards the center of the gradient, whereas terms that are more likely for one level or the other are mapped to the corresponding color.
 
-At the suggestion of \citet{stm2016}, while in theory we could assign more complicated covariates to to the content covariate of the model, going from no content covariate to a categorical content covariate with two levels doubles the number of paraemeters of the model. Two content covarites each with two factor levels would quadruple the numbe of parameters, and so forth. Thus, as we explored the STM, in the modesl we tried which incorporated content covariates, we opted for covariates that only had at most two factor levels. 
-
-
+At the suggestion of \citet{stm2016}, while in theory we could assign more complicated covariates to to the content covariate of the model, going from no content covariate to a categorical content covariate with two levels doubles the number of paraemeters of the model. Two content covarites each with two factor levels would quadruple the numbe of parameters, and so forth. Thus, as we explored the STM, in the models we tried which incorporated content covariates, we opted for covariates that only had at most two factor levels which exhaustively caputred all documents. 
 
 %%plotting of content covariate by color allows indication of words used more for(purple)/againast(green) and when describing the dem(blue)/rep(red) candidate
 
@@ -287,9 +289,13 @@ At the suggestion of \citet{stm2016}, while in theory we could assign more compl
 
 \subsection{Scree Plots}
 
-Contribution/presence of indiviual words to/in given topics by decreasing prevalence 
+Contributions of topics to the coprus
 
-%%top 40 words for each topic, where height indicates how much the word shows up (unnormalized) and red hue indicates FREX calc - need to add formula for FREX calc
+largest contributions of topics to groups of documents grouped by a levels of a covariate
+
+Contribution of indiviual words to given topics
+%%top 40 words for each topic, where height indicates how much the word shows up (unnormalized) and red hue indicates FREX calc as noted in the previous subsection
+
 
 \section{Discussion and conclusions}
 
