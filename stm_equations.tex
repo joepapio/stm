@@ -144,47 +144,27 @@ p(\theta_1...\theta_{51},\mu,\eta|\mathbf{y}) \propto \prod_{n=1}^{51}\Big[p(y_i
 \section{Results}
 
 
-
-
-
-%\subsubsection{Heading on level 3 (subsubsection)}
-
-
-
-%\paragraph{Heading on level 4 (paragraph)}
-
-
-
-
-%\section{Lists}
-
-%------------------------------------------------
-
-%\subsection{Example of list (3*itemize)}
-%\begin{itemize}
-%	\item First item in a list 
-%		\begin{itemize}
-%		\item First item in a list 
-%			\begin{itemize}
-%			\item First item in a list 
-%			\item Second item in a list 
-%			\end{itemize}
-%		\item Second item in a list 
-%		\end{itemize}
-%	\item Second item in a list 
-%\end{itemize}
-
-%------------------------------------------------
-
-%\subsection{Example of list (enumerate)}
-%\begin{enumerate}
-%\item First item in a list 
-%\item Second item in a list 
-%\item Third item in a list
-%\end{enumerate}
-
-%----------------------------------------------------------------------------------------
+\begin{equation}
+\bigg(\prod^D_{d=1}N(\mathbf{\eta_d}|\mathbf{X}_d\mathbf{\gamma}, \mathbf{\Sigma}) \Big(\prod^N_{n=1}Mult(z_{n,d}|\mathbf{\theta}_d) \times Mult(w_n|\mathbf{\beta}_{d,k=z_{d,n}} \Big) \bigg) \times \Pi p(\kappa) \Pi p(\mathbf{\Gamma})
+\end{equation}
 
 \end{document}
 
+
+"where $\Gamma = [\gamma_1|...|\gamma_K] $ is a P x (K-1) matrix of topic prev coeffs for topic prev model specified by (1) and (2), {$\kappa^{(t)}_{.,.},\kappa^{(c)}_{.,.},\kappa^{(i)}_{.,.}$} is a collection of coefficients for the topical content model specified by (5)"
+
+core language model is denoted by (3) and (4) "allowsfor correlations in the topic proportions using the logistic normal"
+
+
+"represent the logistic normal by drawing $\mathbf{\eta}_d \sim Normal_{K-1}(\mathbf{\mu}_d, \mathbf{\Sigma})$ and mapping to the simplex by specifying 
+
+"$\theta_{d,k} = exp(\eta_{d,k}/\Sigma^K_{i=1}exp(\eta_{d,i})) $ where $\eta_{d,K} $ is fixed to zero for identifiabiity."
+
+given $\mathbf{\theta}_d$, for each word in document $d$, topic is sampled from (3), and then conditional on that, word selected over terms $\mathbf{\beta_{z_{d,n}}}$
+
+"model mean vector of logistic normal as simple linear model such that $\mathbf{\mu_d = \Gamma'}\mathbf{x}'_d$ w/ additional regularizing prior on elements of $\mathbf{\Gamma}$ to avoid over-fitting"
+
+"parameterize multinomial dist of word occurances in terms of log-transformed rate deviations from the rates of corpus-wide background distribution, \textbf{m}
+
+"In the proposed model, the log-transformed rate deviations are denoted by a collection of parameters { $\kappa$} where the superscript indicates which set they belong to, that is, $t$ for topics, $c$ for covariates, or $i$ for topic-covariate interactions. In detail, $\kappa^{(t)}$ is a K by V matrix containing the log-transformed rate deviations for each topic $k$ and term $v$, over the baseline log-transformed rate for term $v$. These deviations are shared across all A levels of the content covariate $Y_d$. The matrix  $\kappa^{(c)}$ has dimension A × V, and it contains the log- transformed rate deviation for each level of the covariate $Y_d$ and each term $v$, over the baseline log-transformed rate for term $v$ . These deviations are shared across all topics. Finally, the array $\kappa^{(i)}$ has dimension A × K × V , and it collects the covariate-topic interaction effects. For example, for the simple case where there is a single covariate ($Y_d$) denoting a mutually exclusive and exhaustive group of documents, such as newswire source, the distribution over terms is obtained by adding these log- transformed effects such that the rate $\beta_{d,k,v} \propto exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c)}_{y_d,v} \kappa^{(i)}_{y_d,k,v } )$
 
