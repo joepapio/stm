@@ -444,7 +444,7 @@ is there a way to parallelize the EM process ?
 
 more diagnostics, especially if adding additional covariates actually makes the model better 
 
-visual inference: select one estimated topic, then generate 19 dummy topics randomly from the corpus, see what proportion of lay people can find the real topic. and even what proportion of experts.
+visual inference: select one estimated topic, then generate 19 dummy topics randomly from the corpus \cite{vizinf}, see what proportion of lay people can find the real topic. and even what proportion of experts. 
 
 \bibliographystyle{asa}
 
