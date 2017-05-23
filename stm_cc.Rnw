@@ -32,7 +32,7 @@ library(RColorBrewer)
 library(stm)
 library(ggrepel)
 
-#save(feelC.FX, scree2, partyQ.clouds, feel.clouds,file="objsForPaper.Rdata")
+#save(feelC.FX, scree2, partyQ.clouds, partyQc.FX, feel.clouds,year.FREX,feel.FREX, file="objsForPaper.Rdata")
 load(file="objsForPaper.Rdata")
 
 str_break = function(x, width = 70L) {
@@ -104,58 +104,68 @@ Taking these developments and combining them, Structural Topic Models (STM) \cit
 
 \section{Methodology}
 
+\subsection{Definitions}
+The structural topic model, like LDA and other topic models, assumes an underlying process involving unobserved semantic units, which we define as "topics", generates the data (words and documents) we observe. The observational units are defined to be the words/features we see in the documents, which are members of the corpus. We denote the size of the corpus $D$, indexing documents by $d \in \{1...D\}$. Each document has a number of terms, denoted by $n \in \{1...N_d\}$, where $N_d$ is the number of word/feature positions in the $d$-th document. Abstracted from the corpus is the vocabulary, a vector of all the unique words/features that are observed within the corpus. The terms in the vocabulary are denoted by $v \in \{1...V\}$. Lastly, based on some trial and error, or perhaps based on other studies, we specify the number of topics, denoted $k \in \{1...K\}$.
 
-\subsection{Words, Topics, and Documents}
+The selection/generation of specific words that appear in the $d$-th document, denoted $w_{d,n}$, for the $n$-th observed word/feature position in the $d$-th document, are mediated by by the matrix of levels of the prevalence covariates ( denoted X, of dimension DxP) and the matrix of content covariates, denoted DXA
 
-Within the framework of topic models generally, and the Structural Topic Model specifically, we consider each response as a document, which we define as the $d$-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all unique words or features present within the corpus. 
+These latent units of meaning exist within the corpus, as non exclusive groups of words which have high co-occurrence within documents. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather can occur in multiple topics with varying prevalence, something desirable for languages in which some words can have multiple unrelated meanings. Once the number of topics is decided and the set of topics is computed, we can then estimate the proportions of each topic in each document, as well as how our selected covariates affect these proportions.
 
-Topics represent the unseen semantic units which are contribute to generation of the documents we observe, and we are interested in capturing them by making inference on the observed data. They exist within the corpus, as non exclusive groups of words which have high co-occurrence within documents. Words, as members of the vocabulary, are not exclusive to any particular topic, but rather can occur in multiple topics with varying prevalence, something desirable for languages in which some words can have multiple unrelated meanings. Once the set of topics is computed, then the proportion of each topic within each document can be estimated, as well as how arbitrary covariates affect those proportions.
+\subsection{Data Generating Process}
 
-The structural topic model, like LDA, assumes an underlying process generates the data we observe, that is, the words in the documents. For a corpus of $D$ documents, select a document, $d \in \{1...D\}$. Each document has a number of terms, denoted by $n \in \{1...N_d\}$, where $N_d$ is the number of feature positions in the $d$-th document. Abstracted from the corpus is the vocabulary, a vector of all the unique features that are observed within the corpus. The terms in the vocabulary are denoted by $v \in \{1...V\}$. Lastly, based on some trial and error, or perhaps based on other studies, we specify the number of topics, denoted $k \in \{1...K\}$.
+The data generating process is assumed as follows:
 
-To generate a document $d$, we first draw a topic distribution from the general set of all the topics available in the corpus, resulting in a multinomial distribution $\theta_d$ for that document. Then for each "slot" (IE the words we will observe once the document is generated) in the document, we draw a topic $z_{d,n}$ from a multinomial parameterized by $\theta_d$ to determine what topic that slot will be about. Then, having determined which topic the $n$-th slot will be about, we draw a word from the vocabulary based on the probabilities $z_{d,n}$ assigns to selected members of the vocabulary.
+\begin{itemize}
+\item for $d$ in $\{1...D\}$, draw $\theta_d$ 
+\item for $n$ in $\{1...N_d\}$, draw $z_{d,n}$
+\item for $n$ in $\{1...N_d\}$, draw $w_{d,n}$
+\end{itemize}
 
+Based on this process, we infer/estimate the structure of the $K$ topics, which are represented as distributions of probabilities/proportions over the vocabularly and the effects the covariates have on the rates of those topics appearing in documents and in the corpus. 
 %% for d in 1...D, draw \theta_d, a vector of probabilities that specifies some subset of the K latent topics. the \theta_d$s are influnced by the prevalance covariates specified from the $\mathcal{X}$ matrix.
 
-%% then for each d in D, based on its \theta_d, for n in 1...N_d, draw a part particular topic, then draw a word from that topic's distribution over the vocabularly. This topic-word distribution, denoted $\beta_{d,k,v}$ is influnced by the content covariates specified in the $\mathcal{Y}$ matrix. This yields the w_{d,n}
+%% then for each d in D, based on its \theta_d, for n in 1...N_d, draw a particular topic, then draw a word from that topic's distribution over the vocabularly. This topic-word distribution, denoted $\beta_{d,k,v}$ is influnced by the content covariates specified in the $\mathcal{Y}$ matrix. This yields the w_{d,n}
 
-%where LDA assumes an a global prior distribution over topics for all the documents in the corpus, STM assumes that arbitrary groups of documents specified by levels of a corvariate or set of covariates can have have different prior distributions over topics, thus allowing some documents in group A to be more about topic a whereas documents in groub B can be more about topic b.
+Most topic models use Bayesian methods, and thus require prior distributions be assumed/specified. However, where LDA, opperating on the assumption that a single data generating process produces the entire corpus (in which documents are exchangable with one another), and thus places a single global Dirichlet prior on the Multinomials that select the topics, STM instead assumes that arbitrary groups of documents specified by levels of a corvariate or set of covariates are goverened by a set of priors with a Logistic Normal Distribution. This is what is presumed to make some documents in group (IE covariate level) A to be more about topic a whereas documents in group B can be more about topic b. 
 
-%%ie LDA assumes the same data generating structure for the entire corpus, whereas STM allows the data generating process to vary
+%%stm moves the assumption of exchangability from the level of all documents in the corpus, to subsets of the documents specified by levels of the covariates.
 
+%\subsection{Words, Topics, and Documents} %%maybe change subsection title to definitions?
 
-Get around exchangability issue by giving groups of documents within a covariate their own prior. 
-The inclusion of document level covariates means that documents are no longer exchangeable, since a document from level $a$ of covariate A cannot be exchanged with a document from level $a+1$ of the same covariate. However, this issue is addressed by moving from a global Dirichlet prior specified for all documents (as in LDA) to the use of a Logistic Normal prior with a mean which varies by covariate levels.
+%Within the framework of topic models generally, and the Structural Topic Model specifically, we consider each document as a response, which we define as the $d$-th instance within the corpus. We define the corpus as the entire collection of documents (responses) of interest. Then we define the vocabulary of that corpus to be the vector of all unique words or features present within the corpus after precprocessing (which is discussed in the following section). 
 
+%Topics represent the unseen semantic units which contribute to generation of the observed documents. We are interested in capturing these topics via the words observed in each document.%%topics can be thought of as functions which  mediate word selection?
 
+%To generate a document $d$, we first draw a topic distribution from the general set of all the topics available in the corpus (parameterized by the Logistic Normal, instead of the Dirichlet, which allows the prevalence covariates to influence the topic proportions), resulting in a multinomial distribution $\theta_d$ for that document, which specifies the proportions of each topic in that document. Then for each "slot" (IE the words we will observe once the document is generated) in the document, we draw a topic $z_{d,n}$ from a multinomial parameterized by $\theta_d$ to determine what topic that slot will pertain to. Then, having determined which topic the $n$-th slot will be about, we draw a word from the vocabulary based on the probabilities $z_{d,n}$ (which can also be influenced by $\beta_{d,k,v}$) assigns to selected members of the vocabulary, resulting in the observed $w_{d,n}$.
+
+%Get around exchangability issue by giving groups of documents within a covariate their own prior. 
+%The inclusion of document level covariates means that documents are no longer exchangeable, since a document from level $a$ of covariate A cannot be exchanged with a document from level $a+1$ of the same covariate. However, this issue is addressed by moving from a global Dirichlet prior specified for all documents (as in LDA) to the use of a Logistic Normal prior with a mean which varies by covariate levels.
 
 \subsection{General Model Specification}
 
-\jp{i've started fleshing this part out. some of it is still fragmented, and probably redundant. i'll keep working on it. i need some guidance on how in depth i need to talk about this in the paper and in the presentation}
+The Structural Topic Model is essentially a combination and generalization of three separate topic models, the Core Language Model, which builds off the Correlated Topic Model \citep{Blei:2007jy}, the Topic Prevalence Model, developed in \citep{TMCAFDMR}, and the Topical Content Model, developed in \citep{SAGM}. Analyists can opt to leave out one of the latter two components if not pertinent to their questions of interest \citep{stm2016}.
 
-The Structural Topic Model is essentially broken into three parts, the Core Language Model, which builds off the Correlated Topic Model \citep{Blei:2007jy}, the Topic Prevalence Model, developed in \citep{TMCAFDMR}, and the Topical Content Model, developed in \citep{SAGM}.
-
-\citet{stm2016}
-
-For a document $d$, given a selected number of topics $K$, observed words $\{w_{d,n}\}$ a design matrix of topic prevalence covariates denoted $\mathbf{X}$ and another design matrix of topical content covariates denoted $\mathbf{Y}$
+Presuming the use of both prevalence and content covariates, for a corpus of size $D$ documents,  observed words $\{w_{d,n}\}$ in those documents, a specified number of topics $K$, vocabulary of size $V$, a design matrix of topic prevalence covariates denoted $\mathbf{X}$, and another design matrix of topical content covariates denoted $\mathbf{Y}$, the distributions involved are as follows:
 
 \begin{centering}
 
 \begin{align}
 	\gamma_{k} &\sim Normal_P(0, \sigma^2_kI_P), & for \, k=1...K-1 \\
-	\sigma^2_k &\sim Inverse-Gamma(a,b )\\
-	\mathbf{\theta}_d &\sim LogisticNormal_{K-1}(\mathbf{\mu_d = \Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
+	\sigma^2_k &\sim Inverse-Gamma(a,b )\\ 
+	\mathbf{\theta}_d &\sim LogisticNormal_{K-1}(\mathbf{\Gamma'}\mathbf{x}'_d,\mathbf{\Sigma}) \\
 	\mathbf{z}_{d,n} &\sim Multinomial_K(\mathbf{\theta}_d) & for \, n=1...N_d\\
 	\mathbf{w}_{d,n} &\sim Multinomial_V(\mathbf{B z}_{d,n}) &  for \, n = 1...N_d\\
 	\beta_{d,k,v} & = \frac{exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c)}_{y_d,v} + \kappa^{(i)}_{y_d,k,v } )} {\Sigma_v exp(m_v + \kappa^{(t)}_{k,v} + \kappa^{(c)}_{y_d,v } + \kappa^{(i)}_{y_d,k,v} ) } & for \, v=1...V \, and \, k=1...K
 \end{align}
 \end{centering}
 
-$\gamma_k$ is a vector with length P, where P is the length of prevalence covariate levels and interactions (P increases for more complicated models with larger numbers of covariates, levels of those covariates, and interactions between covariates)
+$\gamma_k$ is a vector with length P, where P is the number of prevalence covariate levels and interactions (P increases for more complicated models with larger numbers of covariates, levels of those covariates, and interactions between covariates)
 
-the individual $\gamma_k$s together form $\Gamma$, a $P \times (K-1)$ matrix of coefficients that specify which coefficients influence which topics
+the individual $\gamma_k$s together form $\Gamma$, a $P \times (K-1)$ matrix of coefficients that specify which cofactor levels influence the prevalence of which topics
 
 for each document, $\theta_d$ is drawn from a logistic normal, with mean and variance derived from the $\Gamma$ matrix
+
+$\theta_{d,k} =$
 
 for each word in the document, $z_{d,n}$ is drawn from a multinomial parameterized by $\theta_d$, thus giving a single latent topic from winch the corresponding $w_{d,n}$ is drawn based on a $\beta$ that connects that topic to a particular set of members in the vocabulary, where a particular $\beta$ can be influenced by the consent covariate of that document, as well as interactions between that covariate level and the given topic.
 
@@ -166,30 +176,23 @@ the full posterior of interest is $p(\mathbf {\eta, z,\kappa, \gamma, \Sigma} |\
 \bigg(\prod^D_{d=1}Normal(\mathbf{\eta_d}|\mathbf{X}_d\mathbf{\gamma}, \mathbf{\Sigma}) \Big(\prod^N_{n=1}Mult(z_{n,d}|\mathbf{\theta}_d) \times Mult(w_n|\mathbf{\beta}_{d,k=z_{d,n}} \Big) \bigg) \times \Pi p(\kappa) \Pi p(\mathbf{\Gamma})
 \end{equation}
 
-$\theta_d$ is the vector of topic proportions, and the prior for $z_{d,n}$
-
-$z_{d,n} $ is latent variable for the nth word in the $d$-th document? (and the prior for $w_{d,n}$? connection to the topics?)
-
-$w_{d,n}$ is the observed occurrence of the $n$-th word slot in the $d$-th document
-
 
 \subsection{Estimation}
 
-\jp{how much detail do i need here?}
 
-The posterior given above is intractable to any closed form evaluation. \citet{stm2016} utilize an approximate variational Expectations Maximization (EM) developed by \citet{WangBlei2013}.
+%%part of the estimation process involves reducing the dimension of the corpus matrix, which has D rows and V columns (one column per term in the vocabulary), into a matrix which has D rows and K columns (one column per topic.
 
-find the approximate posterior $\Pi_d q(\mathbf{\eta}_d)q(\mathbf{z}_d)$ where $q(\mathbf{\eta}_d)$ is a Gaussian with mean $\lambda_d$ and covariance $v_d$ and $q(\mathbf{z}_d)$ is a multinomial with parameter $\phi_d$
+The posterior given in the previous subsection is intractable to any closed form evaluation. \citet{stm2016} utilize an approximate variational Expectations Maximization (EM) developed by \citet{WangBlei2013}. This involves finding the approximate posterior $\Pi_d q(\mathbf{\eta}_d)q(\mathbf{z}_d)$ where $q(\mathbf{\eta}_d)$ is a Gaussian with mean $\lambda_d$ and covariance $v_d$ and $q(\mathbf{z}_d)$ is a multinomial with parameter $\phi_d$, where $\phi_{d,n,k} \propto exp(\lambda_{d,k})\beta_{d,k,w_n}$ and where $\lambda_k$ is an outcome variable of the M-step.
 
-in E step, iterate through each document, updating variational posteriors $q(\mathbf{\eta}_d)$ and $q(\mathbf{z}_d)$
+In E-step, the algorith, iterate through each document, updating variational posteriors $q(\mathbf{\eta}_d)$ and $q(\mathbf{z}_d)$. In the M-step, the algorithm maximizes the the approximate "Evidence Lower Bound" with respect to $\mathbf{\Gamma}$, $\mathbf{\Sigma}$, and $\mathbf{\kappa}$ and updates coefficients in the topic prevalence model, topic model, and global covariance matrix.
 
-in M step, maximize the the approximate "Evidence Lower Bound" with respect to $\mathbf{\Gamma}$, $\mathbf{\Sigma}$, and $\mathbf{\kappa}$
+As with other EM algorithms, this is iterated until convergence is said to be met when changes are smaller than some (small) specified value.
 
 \section{Application}
 
 \subsection{Data: American National Election Studies}
 
-The American National Election Studies has been collecting survey data on elections in the United States since 1948. In addition to numerous traditional survey forms, they have also continuously asked several questions which elicit open ended responses from participants. These include the "like/dislike" questions, which have been collected both on each of the two major US political parties (and their congressional candidates) during most presidential and midterm elections as well as for the parties' presidential candidates during presidential election years.  For this analysis, we focus on the "like/dislike" responses specifically for presidential candidates, which read as follows:
+The American National Election Studies has been collecting survey data on elections in the United States since 1948. In addition to numerous traditional survey forms, they have also continuously asked several questions which elicit open ended responses from participants. These include the "like/dislike" questions, which have been collected both on the two major US political parties and their congressional candidates during most presidential and midterm elections as well as for the parties' presidential candidates during presidential election years.  For this analysis, we focus on the "like/dislike" responses specifically for presidential candidates of the two major parties, which read as follows:
 
 \begin{quote}
 Now I'd like to ask you about the good and bad points of the two candidates for President. Is there anything in particular about [Democratic presidential candidate]/[Republican presidential candidate] that might make you want to vote \textit{for} him?  What is that? Anything else?
@@ -203,8 +206,7 @@ While the ANES has collected open ended responses to these questions over many y
 
 \subsection{Text Pre-Processing}
 
-
-To prepare the open ended survey responses for analysis, we first applied some basic text preprocessing. Although the STM package includes some functions from the text mining (tm) package, we opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved several steps:
+To prepare the open ended survey responses for analysis, we first applied some standard text preprocessing. Although the STM package includes some functions from the text mining (tm) package, we opted to use the quanteda package, since it offered a bit more flexibility and its output could easily be converted into an object which the stm package could utilize. This process involved several steps:
 \begin{enumerate}
 \item remove punctuation
 \item stemming
@@ -215,7 +217,7 @@ To prepare the open ended survey responses for analysis, we first applied some b
 
 Stemming ensures that words like "immigrant" and "immigrants" and "immigration" are recognized as a single feature within the corpus, rather than three separate features. "Partial 2-gramming" retains most features in the vocabulary as single words (IE 1-grams), but blends certain phrases of two word length into single features, so that, for example, "vice president" or "social security" are recognized as single features, rather than two separate features, and thus are "seen" by our model as a different features than "president" or "security" respectively. We opted for "partial 2-gramming" rather than using 2-grams of the entire corpus, since models using just 1-grams or all 1- and 2-grams generated fairly similar models, but topic estimation for models using all possible 1- and 2-grams took significantly longer amounts of time to run. Stop word removal involves filtering out a standard set of English "function" words, including most articles and prepositions, as well as some corpus specific features, like "ae" which indicates that the interviewer asked "Anything else?" Lastly, very low frequency words ($n \leq 3$ instances) which might slow computation but add nothing to the interpret ability of the model are also removed. 
 
-Two example responses are given below, showing first the unprocessed response followed by a "toy" document feature matrix representing a corpus of only that individual document. Document feature matrices representing corpora with more than one document will almost always have some entries which are zero, since two documents will rarely have exactly the same set of words represented. 
+Two example responses are given below, showing first the unprocessed response followed by a "toy" document feature matrix representing a corpus of only that individual document. Document feature matrices representing corpora with more than one document will almost always have numerous entries which are zero, since two documents will rarely if ever be represented by exactly the same vocabulary. 
 
 Example 1: Original text
 <<ex1orig, eval=TRUE, echo=FALSE>>=
@@ -239,31 +241,25 @@ rbind(example4@Dimnames$features, example4@x)
 
 After this preprocessing of the corpus, the remaining dataset contains 23,507 instances of open ended responses with counts for 3,357 features (1-grams and selected 2-grams). This corresponds to 9,977 individuals who responded to between one and four of these questions over the course of six presidential elections, taking place every four years between 1984 and 2004.
 
-%% this is incorrect. need to fix it After this process, the corpus is then represented by a 23,507 rows by 3,357 column document feature matrix, denoted $ \mathcal{X} $, in which the $d$-th row corresponds to the $d$-th document and the $w$-th column represents the $w$-th feature in the vocabulary. Then the $d,w$-th entry in the matrix represents the number of times the $w$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
+After this process, the corpus is then represented by a 23,507 rows by 3,357 columns document feature matrix, in which the $d$-th row corresponds to the $d$-th document and the $v$-th column represents the $v$-th feature in the vocabulary. Then the $d,v$-th entry in the matrix represents the number of times the $v$-th feature occurs in the $d$-th document. This matrix is very sparse, with the vast majority of entries being zeros.
 
-\subsection{Models}
+\subsection{ANES Models}
 
-After fitting models with various numbers of topics, we settled on models using $K=60$ topics. This is close to the number of topics ($K=69$) which \citet{stm2013} fit for their analysis of a open ended survey data from 2008 inquiring about the top issues of the campaign, for which they were able to obtain and compare hand coded analysis.
+After exploring simple models with various numbers of topics, we settled on models using $K=60$ topics. This is close to the number of topics ($K=69$) which \citet{stm2013} fit for their analysis of a open ended survey data from the ANES for the 2008 election, inquiring about the top issues of the campaign, for which they were also able to obtain and compare hand coded analysis.
 
 As a baseline model, we fit the election year as a covariate. Rather than fitting this as a linear coefficient, we opted for a categorical variable to avoid forcing the prevalence of a given topic to either strictly increase or strictly decrease over time. This model is similar to the model presented in \citet{dtm2006}.
 
-In addition to the year and respondent's party ID, further models fit one of the selected covariates (respondent's race, gender, income percentile, educational attainment, church attendance, ideology, or feeling towards the candidate ), 
-
-While our intention had been to examine how topics and topic proportions differ when models with different covariates are fit, none of the models fit appear to be particularly different.
-
-Comparison of word clouds and scree plots suggest only very minor differences both in overall word proportions and FREX calculations. None of the 6 models fit using respondent democraphic information (gender, race, income, education, church attendance, ideology) display enough of a difference to visually justify that they are particularly different from one another. These differences (or overall lack thereof) are discussed in the following section.
+In addition to the year and respondent's party ID, further models fit one of the selected covariates (respondent's race, gender, income percentile, educational attainment, church attendance, or ideology). While our intention had been to examine how topics and topic proportions differ when models with different covariates are fit, none of the models fit appear to be particularly different. Models fit with different covariates yielded essentially the same topics, with only negigible differences in word prevalence within topics or topics within documents when compared via screeplots or word clouds. However, these visualizations, which still yield valuable and interesting insights into the open ended survey corpus, will be discussed in the following section.
 
 \section{Contextualizing the findings: Discussion and Visualization}
 
-\jp{still more cleaning needed, plus need to pick some additional plots. i will include all plots of each type in the appendix, but i'm not sure how to decide which plots i should include in this section}
+From the analyses we performed, we failed to find much variation between models which incorporate demographic information about the respondents. Thus we cannot say with any certainty that our identified covariates have any significant effects on the estimated topics or how much those topics show up within a given document. However, the models and the overall process of studying their output have produced many insights which correspond to things that happened during given elections. Incorporating various visualization techniques, some of these insights are discussed below.
 
-From the analyses we performed, there isn't enough variation between models which incorporate demographic information about the respondents to say with any certainty that our identified covariates have any significant effects on the estimated topics or how much those topics show up within a given document. However, the models and the overall process of studying their output have produced many insights which correspond to things that happened in given elections. Incorporating various visualization techniques, some of these insights are discussed below.
+Most of the visualizations done throughout this paper leverage the amazing power and flexibility of ggplot \citep{ggplot2} and other packages within tidyverse \citep{tidyverse} to "wrassle" data into tidy structures and then make plots more dynamic and informative, something which is much harder to do efficiently when relying on the base R plotting functionality, as is the case with the STM package \citep{stmR}.
 
-Most of the visualizations done throughout this paper leverage the amazing power and flexibility of ggplot \citep{ggplot2} and other packages within tidyverse \citep{tidyverse} to "wrassle" data in tidy structures and then make plots more dynamic and informative, something which is much harder to do efficiently when relying on the base R plotting functionality, as is the case with the STM package \citep{stmR}.
+Perhaps the most fun and also the most frustrating part of this project was considering ways to summarize the information gleaned from fitting the various models. While it is our hope that as scholars continue to use and explore these procedures, more easily assessable metrics of fit will be developed, we focus mostly on graphical examinations at this juncture. We produce plots of topic proportions to show some variation in topic prevalance across years and also by selected covariates. We incorporate expert political science opinion of American elections via examination of wordclouds and examplar reponses for particular topics in order to identify which topics are semantically coherent. We also produce screeplots to determine how particular words contribute to the structure of particular topics, as well as how particular topics contribute to the structure of the coprus or subsets of the corpus.
 
-Perhaps the most fun and also the most frustrating part of this project was considering ways to summarize the information gleaned from fitting the various models. While it is our hope that as scholars continue to use and explore these procedures, more easily assessable metrics of fit will be developed, we focus mostly on graphical examinations.
-
-Comparison of these models was not straight forward. Without some knowledge of distributions to compare to, goodness of fit or other such diagnostics are hard to come by. However, there is still a great deal of exploratory analysis which can be performed, particularly via visualization. Incorporation of expert (political science) opinion by way of examination of wordclouds, proportion plots, and exemplar documents can also provide valuable insight with regard to which topics do or do not contain useful and coherent semantic information. These are discussed in turn, accompanied by figures for a selected number of more interesting topics. Plots for all topics are contained in the Appendix.
+We also suggest a potential method for incorporating visual inference into future iterations of this work.
 
 \subsection{Simultaneous plotting of multiple covariates}
 
@@ -271,7 +267,7 @@ Comparison of these models was not straight forward. Without some knowledge of d
 
 %For a given topic, the prevalence of that topic can vary by any covariate incorporated into the model. In the models fit, topics vary above or below the mean for that topic by year, party ID, and other covariates as they're specified. Interactions between covariates are also allowed.
 
-In Figure \ref{simcovs}, we get a broad overview of the behavior of topics across the entire corpus with respect to Election year, Candidate Party, and voter Party.
+In Figure \ref{simcovs}, we get a broad overview of the behavior of topics across the entire corpus with respect to Election year, Candidate Party, and voter Party. 
 
 \begin{figure}[H]
 <<simcovs, echo=FALSE, fig.width= 7.7, fig.height=10>>=
@@ -292,9 +288,10 @@ feelC.FX %>% # filter(topic==i) %>%
 \caption{\label{simcovs} Captiony caption here}
 \end{figure}
 
+From this broad overview, we can then focus on particular topics which exhibit some interesting behavior based on knowledge of events that happened during particular election years, taking their wordclouds into consideration.
+
 %%add some plots from partyQ model, some like/dislike, maybe one or two from race or gender?
 
-%%maybe a few wordcloud + scatter plot combos for some of these observations?
 
 \jp{need to think through these. probably not keep them all. maybe see what dave thinks about them?}
 
@@ -302,13 +299,30 @@ things to note? variation of the economy (topic 1), yet still always above avera
 
 education - topic 59 has a notable spike in the 2000 cycle \cite{edu2000}. Both candidates brought up education a lot, and was one of the earliest agenda items for Bush 43 presidency when he worked "across the aisle" with Democrats to pass the now infamous No Child Left Behind.
 
-topic 7, on the vice president, has rather high proportions in 1984 and 1988. in 1984, mondale nominated Geraldine Ferraro for his running mate, the first major party to have a woman fill the role. as we'll see in wordclouds presented subsequently, a prominent feature in this topic are the words "woman" and "women". And in 1988, george hw bush, then vice president to reagan, ran to succeed the sitting president. 
+As the president serves as a stabilizing role within the country, presidential candidates' health, especially with respect to age, is frequently a topic in presidential elections. Notably, it shows up at higher than "background rates" in 1984, when Regan was running for election and there were concerns about his age and his mental health, and also in 1996, when relatively youthful sitting president Bill Clinton was challenged by much older Senator Bob Dole.
 
-topic 51 - age, comes up a little in many cycles, but probably a lot in 1996 because of dole
+\begin{figure}[H]
+<<top51prop, echo=FALSE, fig.width= 6, fig.height=5>>=
+partyQc.FX %>%  filter(topic==51) %>%
+  filter(partyID == "1. Republican" | 
+           partyID == "2. Independent" | 
+           partyID == "5. Democrat") %>%
+  ggplot(aes(x=yearf, y=beta)) +
+  # geom_point(aes(fill=feel, shape=partyQ), size=3) +
+  geom_point(aes( shape=feel, color=partyID)) +
+    ylim(0,.08) +
+  #  facet_wrap(~feel) + 
+  # theme(legend.position = "none") + 
+  ylab("Topic Proportion") +
+  xlab("Year")+
+    ggtitle("Proportions by Respondent Party and Sentiment for Topic 51")
+@
+\caption{\label{top51prop} Proportion of Topic 51, regarding age}
+\end{figure}
 
-Topic 18 and 23 both appear to relate to Bill clinton and scandals, although topic 18 shows up across 3 elections (both of clinton's, as well as gore's) whereas topic 23 appears to be concentrated mostly in 1996 during clinton's reelection. 
+Topic 18 and 23 both appear to relate to Bill clinton and scandals, although topic 18 shows up across 3 elections (both of Clinton's, as well as Gore's) whereas topic 23 appears to be concentrated mostly in 1996 during clinton's reelection, and may be particularly about the Watergate Scandal.
 
-topic 42, about "change" and "newness" when democrats retook the white house after republicans holding it for 12 years.
+%topic 42, about "change" and "newness" when democrats retook the white house after republicans holding it for 12 years.
 
 50 - last four years - in 1984-1996, referendum on incumbent. vs in 2000, gore distanced himself from clinton, and in 2004, bush managed to make the election about kerry
 
@@ -341,13 +355,28 @@ From Figure \ref{moodscree}, we can observe not just what topics are being talke
 When asked about what they disliked about the Republican candidate, the most common topic was Topic 25, which references Taxes. It came up most in the 2004 election, after bush lowered taxes 2001 and again in 2003 \cite{bushtaxcuts}, benefiting mostly those Americans with income above the 95th percentile ($\geq \$150,000$) \cite{census2002}.  When asked what they liked about the Republican candidates, Topic 1, referencing the economy, was the most prevalent. 
 
 %Contribution of indiviual words to given topics
-%%top 40 words for each topic, where height indicates how much the word shows up (unnormalized) and red hue indicates FREX calc as noted in the previous subsection
+
+From Figure \ref{top7scree}, we can see the top 40 words for Topic 07, which pertains to Vice Presidential Nominees and Running Mates, where height indicates how much the word shows up (unnormalized) and red hue indicates the weighted FREX calculation, which is described in the next subsection, where we discuss this Figure in conjunction with Figure \ref{top7FREX}.
+
+\begin{figure}[H]
+<<top7screen, echo=FALSE, warning=FALSE>>=
+feel.FREX %>% filter(topic==7) %>% 
+  arrange(desc(proportion)) %>% slice(1:40) %>%
+  ggplot(aes(x=seq(1:length(proportion)), y= proportion, label=words)) + 
+  geom_point(aes(color=frex)) +
+  geom_text_repel(aes(color=frex, label=ifelse(seq(1:length(proportion))<31,
+                                               as.character(words),'')), force=2.5) +
+    scale_color_gradient(low = "black", high="red") + 
+    theme(legend.position = "none")+ 
+  labs(y="Contribution to Topic", x="Order")+
+    ggtitle("Screeplot for Topic 07")
+@
+\caption{\label{top7scree} Screeplot for topic 07, about Vice Presidential Nominees and Running Mates}
+\end{figure}
 
 \subsection{Wordclouds}
 
-To make the wordclouds more informative, two measures were mapped to the displays. Firstly, raw proportions were mapped to the size of the word. However, as noted in Roberts and elsewhere, high frequency words alone may obscure some of what is going on within a given topic if those words also occur frequently in other topics. Thus, their FREX calculation, which also incorporates a weighted measure of topic "exclusivity" is mapped to the saturation of a word, so that words which also occur elsewhere show up darker (in black), and words which are more exclusive to the given topic show up more brightly (in this case, in red).
-
-Wordclouds are generated using ggplot. For a given topic, we identify the highest frequency words, and display them in the plot, proportion mapped to size such that larger words imply a higher presence within that topic. However, as \citet{stm2013} and \citet{FREX2012} note, high frequency words alone may fail to capture the "essence" of the topic, since high frequency words may also appear in other topics. To address this, \citet{FREX2012} developed a Frequency-Exclusivity metric, "FREX", which can combine a particular word's frequency within a given topic and its exclusivity towards other topics. The FREX value for the $v$-th word and the $k$-th topic is computed by:
+Wordclouds are generated using ggplot. For a given topic, we identify the highest frequency words, and display them in the plot, with word proportion mapped to size such that larger words imply a higher presence within that topic. However, as \citet{stm2013} and \citet{FREX2012} note, high frequency words alone may fail to capture the "essence" of the topic, since high frequency words may also appear in other topics. To address this, \citet{FREX2012} developed a Frequency-Exclusivity metric, "FREX", which can combine a particular word's frequency within a given topic and its exclusivity towards other topics. The FREX value for the $v$-th word and the $k$-th topic is computed by:
 
 \begin{equation}
 FREX_{k,v} = \Big(\frac{w}{ECDF(\beta_{k,v}/\sum^K_{j=1}\beta_{j,v})} + \frac{1-w}{ECDF(\beta_{k,v})} \Big)^{-1}
@@ -355,15 +384,30 @@ FREX_{k,v} = \Big(\frac{w}{ECDF(\beta_{k,v}/\sum^K_{j=1}\beta_{j,v})} + \frac{1-
 
 where $w$ is a value chosen by the analyst to distribute weight between Exclusivity (left side addend) and Frequency (right addend) (we set it to $w=0.5$), and ECDF is the empirical cumulative distribution function, and $\beta_{k,v}$ indicates the probability of the $v$-th term given the $k$-th topic. 
 
-To make our wordclouds more informative, we compute the FREX value for the entire vocabulary, conditioned on the topic, and then map those values to a two color gradient, so that the more exclusive a word is, the more red it will be in the graphic. Thus a term that is both frequent and exclusive will show up large and red, where as a term that is frequent but less elusive will be a less vibrant shade of red, or even gray or black. Likewise, a term that is less frequent but still exclusive will be smaller, but can still be a brighter red. By combining both the overall prevalence of words within a topic and their FREX values, we present a more cohesive picture of each topic than either metric alone.
+So, to make our wordclouds more informative, we compute the FREX value for the entire vocabulary, conditioned on the topic, and then map those values to a two color gradient, so that the more exclusive a word is, the more red it will be in the graphic. Thus a term that is both frequent and exclusive will show up large and red, whereas a term that is frequent but less elusive will be a less vibrant shade of red, or even gray or black. Likewise, a term that is less frequent but still exclusive will be smaller, but can still be a brighter red. By combining both the overall prevalence of words within a topic and their FREX values, we present a more cohesive picture of each topic than either metric alone.
 
-%%add FREX wordcloud for topic 8
+\begin{figure}[H]
+<<top7FREX, echo=FALSE, warning=FALSE>>=
+year.FREX %>% 
+  filter(topic==7) %>% arrange(desc(proportion)) %>% slice(1:50) %>% 
+      ggplot(aes( x=1, y=1, size=proportion, label=words) ) +
+      geom_text_repel(aes(color=frex),segment.alpha = 0, force = 1) +
+      scale_size(range = c(3, 15), guide = FALSE) +
+      scale_color_gradient(low = "black", high="red") +
+      scale_y_continuous(breaks = NULL) +
+      scale_x_continuous(breaks = NULL) +
+      labs(x = '', y = '') +
+      theme_classic() +
+      ggtitle("Topic 07 colored by weighted Exclusivity")
+@
+\caption{\label{top7FREX} Wordcloud for topic 07, regarding Running Mates and Vice Presidential Candidates}
+\end{figure}
 
+From \ref{simcovs}, we can see that the rates for topic 07 are higher in 1984 and 1988. From \ref{top7scree} and \ref{top7FREX} we gather that this topic pertains to the selection of Running Mates and the Vice Presidency and its nominee. Notably, in 1984, running against incumbent Ronald Reagan, Democratic presidential nominee Walter Mondale nominated Geraldine Ferraro for his running mate, making her the first woman to be nominated to that role for a major party. This move on Mondale's part was heralded by some as a bold choice and criticized by others as an act of desperation. Presumably, the proportion of this topic remained high in 1988, sicne George Herbert Walker Bush, then the sitting Vice President, ran to succeed Reagan, his former running mate.  
 
 Additional wordclouds are created to inspect the ways in which one of two content covariates influence word selection within a topic. We considered two models, one with Voter sentiment (like/dislike) (see Figure \ref{feelclouds}) assigned as the content covariate, and the other with Candidate Party (Democrat/Republican) (see Figure \ref{partyQclouds}) mapped to the content covariate, to see if either of these influenced \textit{how} respondents discussed topics. 
 
 Here again, we map the proportion with which a word shows up in a given topic to the size of the term in the plot. But for a given term, now we map how much the term's frequency, conditioned on selected topic, content covariate level, and their interactions, deviates from the prevalence of that term across the corpus to a three color gradient, with gray being the central color. Terms that are not particularly "biased" towards either level of the content covariate are mapped towards the center of the gradient, whereas terms that are more likely for one level or the other are mapped to the corresponding color.
-
 
 \begin{figure}[H]
 <<feelclouds, echo=FALSE, fig.width= 7.7, fig.height=10>>=
@@ -409,81 +453,35 @@ Here again, we map the proportion with which a word shows up in a given topic to
 
 At the suggestion of \citet{stm2016}, while in theory we could assign a more complicated set of  covariates to the content covariate of the model, going from no content covariate to a categorical content covariate with two levels doubles the number of parameters of the model. Two content covariates each with two factor levels would quadruple the number of parameters, and so forth. Thus, as we explored the STM, in the models we tried which incorporated content covariates, we opted for covariates that only had at most two factor levels which exhaustively captured all documents. 
 
+%% maybe select one or two sets of three wordclouds - basic/frex, dem vs rep candidate, and like vs dislike? based on the observations 
 
-%%plotting of content covariate by color allows indication of words used more for(purple)/againast(green) and when describing the dem(blue)/rep(red) candidate
-
-%%a few sets of three wordclouds - basic/frex, dem vs rep candidate, and like vs dislike
-
-\jp{this is stilljust stray thoughts. need to organize these stray thoughts into something more coherent}
-
-need more in the way of model fit stats, or some kind of nested model comparison?
-
-application to larger texts
-
-more guidance on how selecting K impacts the models - some way to measure if there's too many or two few topics for a corpus - ie too many "garbage" topics
-
-ways to compare between various K sized models
-
-seems odd that adding covariates didn't really change the topic estimation if topic estimation happens at same time as param estimation - maybe too many covariates or levels of covariates?
-
-cleaner/more efficient way to reparameterize?
-
-my functions to fill in some of the gaps in the STM package's functions, better and more varied plotting, tidying param values to facilitate plotting
 
 \section{Conclusions and Future areas of Interest}
 
-\jp{future work, things i wish i could have considered, spent more time on}
+\jp{future work, things i wish i could have considered, spent more time on, still need to organize these stray thoughts into something more coherent}
+
+need more in the way of model fit stats, or some kind of nested model comparison? more diagnostics, especially if adding additional covariates actually makes the model better 
+
+curious how things are different with application to longer texts (these documents are fairly short on average)
+
+more guidance on how selecting number of topics K impacts the models - some way to measure if there's too many or two few topics for a corpus - ie too many "garbage" topics. maybe ways to compare between various K-n, K, and K+n sized models
+
+seems odd that adding covariates didn't really change the topic estimation if topic estimation happens at same time as param estimation - maybe too many covariates or levels of covariates?
+
+simpler/more efficient way to reparameterize?
+
+my functions more generalized to fill in some of the gaps in the STM package's functions, better and more varied plotting, tidying param values to facilitate plotting
 
 The flexibility of STM is both a blessing and a curse. Even with a deeper knowledge of stats, examining/understanding/interpreting models is not entirely straight forward. If the goal is to make available for social sciences, humanities, many may lack the background to apply the model in a reliable way, particularly if it has any complexity.
 
-Compare expert political science opinion to large number of lay opinions. present topics (or exemplars) to large number of people and see what they think the topics about via online tools like amazon's mechanical turk
+Compare expert political science opinion to large number ($n \geq 100$) of lay opinions. present topics (or exemplars) to large number of people and see what they think the topics are about via online tools like amazon's mechanical turk. perhaps incorporate visual inference: select one estimated topic, then generate n dummy topics randomly from the corpus vocabulary \cite{vizinf} such that 1/(n+1) yields desired alpha level, setting up analog to hypothesis tests. see what proportion of lay people can find the real topic. and even what proportion of experts. 
 
-there's a lot more responses for the midterms. curious how those responses and models might be different. several of the presidential model topics are person/year specific (particular to bush or clinton or gore or reagan, etc). probably wouldn't see so much of that for the congressional elections.
+there's a lot more responses for the midterms. curious how those responses and models might be different. several of the presidential model topics are person/year specific (particular to bush or clinton or gore or reagan, etc). probably wouldn't see so much of that for the congressional elections. or maybe still would, since common wisdom is that midterm congressional elections are often a referendum on the sitting president.
 
-is there a way to parallelize the EM process ?
-
-more diagnostics, especially if adding additional covariates actually makes the model better 
-
-visual inference: select one estimated topic, then generate 19 dummy topics randomly from the corpus \cite{vizinf}, see what proportion of lay people can find the real topic. and even what proportion of experts. 
+The estimation process/EM algorithm can take a while to converge... is there a way to parallelize the EM process ? 
 
 \bibliographystyle{asa}
 
 \bibliography{references}
 
-
 \end{document}
-
-
-\hh{you'll need to define every symbol and index that you use.}
-
-$\beta_{d,v}^k$ is the sum of the covariate effects?, and a prior for $w_{d,n}$
-
-\begin{centering} 
-Topic Prevalence:
-\begin{align*}
-	\mu_{d,k} &= X_d\gamma_k \\
-	\gamma_k &\sim \mathcal{N}(0,\sigma_k^2)\\
-	\sigma_k^2 &\sim Gamma(s^{\gamma}, r^{\gamma})
-\end{align*}
-
-$\mu_{d,k}$ is the expected topic prevalence of the k-th topic in the d-th document 
-
-$\gamma_k$ is the prior for the kth topic mean
-
-$\sigma^2_k$ is the prior for the kth topic variance
-
-Language Model:
-\begin{align*}
-\theta_{d} &\sim LogisticNormal(\mu_d, \Sigma) \\
-z_{d,n} &\sim Mult(\theta_d)\\
-w_{d,n} &\sim Mult(\beta^{k=z_d,n}_d, r^{\gamma})
-\end{align*}
-
-\end{centering}
-
-\centering Topical Content:
-\begin{align*}
-\beta_{d,v}^k &\propto exp(m_v+\kappa_v^{.,k}+\kappa_v^{y,.}+\kappa_v^{y,k}) \\
-\kappa_v^{y,k} &\sim Laplace(0,\tau_v^{y,k})\\
-\tau_v^{y,k} &\sim Gamma(s^{\kappa}, r^{\kappa})
-\end{align*}
